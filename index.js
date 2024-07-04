@@ -1,26 +1,64 @@
-document.getElementById("hitButton").onclick = hit;
-// document.getElementById("standButton").onclick = stand;
-// document.getElementById("newGameButton").onclick = newGame;
+// DOM Elements
+const hitBtn = document.getElementById("hitBtn");
+const standBtn = document.getElementById("standBtn");
+const newGameBtn = document.getElementById("newGameBtn");
+const playersDiv = document.getElementById("playersCards");
+const dealersDiv = document.getElementById("dealersCards");
+const winnerDiv = document.getElementById("winner");
 
-let deck = new CardDeck();
-let dealersCards = [];
-let dealerTotal = 0;
-let playersCards = [];
-let playerTotal = 0;
-let playersDiv = document.getElementById("playersCards");
-let dealersDiv = document.getElementById("dealersCards");
+// Game Variables
+const deck = new CardDeck();
+let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
-//console.log(deck.cards);
-function calculateTotal(cards) {}
-function addCard(player, cards, div) {
-  cards.push(deck.getCard());
-  let imgPath;
-  if (player !== "dealer" || cards.length === 1) {
-    imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
-  } else {
-    imgPath = "./cards-1.3/back.png";
+function initializeGame() {
+  dealersCards = [];
+  playersCards = [];
+  dealerTotal = 0;
+  playerTotal = 0;
+
+  clearDiv(playersDiv);
+  clearDiv(dealersDiv);
+  clearDiv(winnerDiv);
+
+  gameStatus = "inProgress";
+
+  for (let i = 0; i < 2; i++) {
+    hit();
+    hit("dealer");
   }
-  div.innerHTML += '<img src="' + imgPath + '" >';
+
+  setTimeout(function () {
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
+  }, 50);
+
+  hitBtn.addEventListener("click", hit);
+  standBtn.addEventListener("click", endGame);
+  newGameBtn.removeEventListener("click", newGame);
+}
+
+function clearDiv(div) {
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
+  }
+}
+
+function newGame() {
+  newGameBtn.toggleAttribute("hidden");
+  deck.newGame();
+  initializeGame();
+}
+
+function checkStatus() {
+  if (playerTotal > 21 || dealerTotal > 21) {
+    endGame();
+  }
+}
+
+function playDealer() {
+  while (dealerTotal < 17) {
+    hit("dealer");
+  }
 }
 
 function hit(player) {
@@ -31,18 +69,74 @@ function hit(player) {
     addCard(player, dealersCards, dealersDiv);
     dealerTotal = calculateTotal(dealersCards);
   }
+  checkStatus();
 }
 
-function stand() {}
-function checkStatus() {}
-function newGame() {}
-function initializeGame() {
-  for (let i = 0; i < 2; i++) {
-    hit();
-    hit("dealer");
+function addCard(player, cards, div) {
+  cards.push(deck.getCard());
+  let imgPath;
+  if (player !== "dealer" || cards.length === 1 || gameStatus !== "inProgress") {
+    imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
+  } else {
+    imgPath = "./cards-1.3/back.png";
   }
-  setTimeout(function () {
-    document.getElementById("hitButton").removeAttribute("hidden");
-  }, 50);
+  let img = document.createElement("img");
+  img.src = imgPath;
+  div.appendChild(img);
 }
+
+function calculateTotal(cards) {
+  let total = 0;
+  let aces = 0;
+  for (let i = 0; i < cards.length; i++) {
+    total += cards[i].pointValue;
+    if (cards[i].rank === "ace") {
+      aces++;
+    }
+  }
+  while (total > 21 && aces > 0) {
+    total -= 10;
+    aces--;
+  }
+  return total;
+}
+
+function endGame() {
+  if (gameStatus === "inProgress") {
+    gameStatus = "gameOver";
+    playDealer();
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
+    newGameBtn.toggleAttribute("hidden");
+
+    hitBtn.removeEventListener("click", hit);
+    standBtn.removeEventListener("click", endGame);
+    newGameBtn.addEventListener("click", newGame);
+
+    let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
+    dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
+
+    let winner = document.createElement("h3");
+    let finalHandValues = document.createElement("p");
+
+    if (playerTotal > 21) {
+      winner.textContent = "Player Busted, Dealer Wins";
+    } else if (dealerTotal > 21) {
+      winner.textContent = "Dealer Busted, Player Wins";
+    } else if (dealerTotal > playerTotal) {
+      winner.textContent = "Dealer Wins";
+    } else if (playerTotal > dealerTotal) {
+      winner.textContent = "Player Wins";
+    } else {
+      winner.textContent = "Push (Tie)";
+    }
+
+    finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+
+    winnerDiv.appendChild(winner);
+    winnerDiv.appendChild(finalHandValues);
+  }
+}
+
+// Start the game
 initializeGame();

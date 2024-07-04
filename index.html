@@ -12,11 +12,16 @@
     <link href="./style.css" rel="stylesheet" />
   </head>
   <body>
-    <div class="container text-center">
+    <div class="container text-center my-5">
+      <div id="winner" class="container my-2"></div>
+      <h3 class="container">Dealer's Cards</h3>
       <div id="dealersCards" class="container"></div>
+      <h3 class="container">Your Cards</h3>
       <div id="playersCards" class="container"></div>
       <div class="container">
-        <button hidden id="hitButton" type="button" class="btn btn-warning mt-3">Hit</button>
+        <button hidden id="hitBtn" type="button" class="btn btn-warning mt-3 me-5">Hit</button>
+        <button hidden id="standBtn" type="button" class="btn btn-danger mt-3 ms-5">Stand</button>
+        <button hidden id="newGameBtn" type="button" class="btn btn-success mt-3">New Game</button>
       </div>
     </div>
     <script
