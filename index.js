@@ -10,6 +10,97 @@ const winnerDiv = document.getElementById("winner");
 const deck = new CardDeck();
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
+function initializeGame() {
+  dealersCards = [];
+  playersCards = [];
+  dealerTotal = 0;
+  playerTotal = 0;
+
+  clearDiv(playersDiv);
+  clearDiv(dealersDiv);
+  clearDiv(winnerDiv);
+
+  gameStatus = "inProgress";
+
+  for (let i = 0; i < 2; i++) {
+    hit();
+    hit("dealer");
+  }
+
+  setTimeout(function () {
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
+  }, 50);
+
+  hitBtn.addEventListener("click", hit);
+  standBtn.addEventListener("click", endGame);
+  newGameBtn.removeEventListener("click", newGame);
+}
+
+function clearDiv(div) {
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
+  }
+}
+
+function newGame() {
+  newGameBtn.toggleAttribute("hidden");
+  deck.newGame();
+  initializeGame();
+}
+
+function checkStatus() {
+  if (playerTotal > 21 || dealerTotal > 21) {
+    endGame();
+  }
+}
+
+function playDealer() {
+  while (dealerTotal < 17) {
+    hit("dealer");
+  }
+}
+
+function hit(player) {
+  if (player !== "dealer") {
+    addCard(player, playersCards, playersDiv);
+    playerTotal = calculateTotal(playersCards);
+  } else {
+    addCard(player, dealersCards, dealersDiv);
+    dealerTotal = calculateTotal(dealersCards);
+  }
+  checkStatus();
+}
+
+function addCard(player, cards, div) {
+  cards.push(deck.getCard());
+  let imgPath;
+  if (player !== "dealer" || cards.length === 1 || gameStatus !== "inProgress") {
+    imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
+  } else {
+    imgPath = "./cards-1.3/back.png";
+  }
+  let img = document.createElement("img");
+  img.src = imgPath;
+  div.appendChild(img);
+}
+
+function calculateTotal(cards) {
+  let total = 0;
+  let aces = 0;
+  for (let i = 0; i < cards.length; i++) {
+    total += cards[i].pointValue;
+    if (cards[i].rank === "ace") {
+      aces++;
+    }
+  }
+  while (total > 21 && aces > 0) {
+    total -= 10;
+    aces--;
+  }
+  return total;
+}
+
 function endGame() {
   if (gameStatus === "inProgress") {
     gameStatus = "gameOver";
@@ -47,94 +138,5 @@ function endGame() {
   }
 }
 
-function calculateTotal(cards) {
-  let total = 0;
-  let aces = 0;
-  for (let i = 0; i < cards.length; i++) {
-    total += cards[i].pointValue;
-    if (cards[i].rank === "ace") {
-      aces++;
-    }
-  }
-  while (total > 21 && aces > 0) {
-    total -= 10;
-    aces--;
-  }
-  return total;
-}
-
-function addCard(player, cards, div) {
-  cards.push(deck.getCard());
-  let imgPath;
-  if (player !== "dealer" || cards.length === 1 || gameStatus !== "inProgress") {
-    imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
-  } else {
-    imgPath = "./cards-1.3/back.png";
-  }
-  let img = document.createElement("img");
-  img.src = imgPath;
-  div.appendChild(img);
-}
-
-function hit(player) {
-  if (player !== "dealer") {
-    addCard(player, playersCards, playersDiv);
-    playerTotal = calculateTotal(playersCards);
-  } else {
-    addCard(player, dealersCards, dealersDiv);
-    dealerTotal = calculateTotal(dealersCards);
-  }
-  checkStatus();
-}
-
-function playDealer() {
-  while (dealerTotal < 17) {
-    hit("dealer");
-  }
-}
-
-function checkStatus() {
-  if (playerTotal > 21 || dealerTotal > 21) {
-    endGame();
-  }
-}
-
-function newGame() {
-  newGameBtn.toggleAttribute("hidden");
-  deck.newGame();
-  initializeGame();
-}
-
-function clearDiv(div) {
-  while (div.firstChild) {
-    div.removeChild(div.firstChild);
-  }
-}
-
-function initializeGame() {
-  dealersCards = [];
-  playersCards = [];
-  dealerTotal = 0;
-  playerTotal = 0;
-
-  clearDiv(playersDiv);
-  clearDiv(dealersDiv);
-  clearDiv(winnerDiv);
-
-  gameStatus = "inProgress";
-
-  for (let i = 0; i < 2; i++) {
-    hit();
-    hit("dealer");
-  }
-
-  setTimeout(function () {
-    hitBtn.toggleAttribute("hidden");
-    standBtn.toggleAttribute("hidden");
-  }, 50);
-
-  hitBtn.addEventListener("click", hit);
-  standBtn.addEventListener("click", endGame);
-  newGameBtn.removeEventListener("click", newGame);
-}
+// Start the game
 initializeGame();
