@@ -3,6 +3,7 @@ class Card {
     this.rank = rank;
     this.suit = suit;
     this.pointValue = pointValue;
+    // https://code.google.com/archive/p/vector-playing-cards/
     this.image = image;
   }
 }
