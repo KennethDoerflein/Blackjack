@@ -1,4 +1,18 @@
 img {
-  max-width: 18% !important;
-  margin: 1%;
+  max-width: 10% !important;
+  margin: 0.2%;
+}
+#hitBtn {
+  padding: 6px 22px 6px 22px;
+}
+#dealersCards,
+#playersCards {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+#winner {
+  color: red;
+  font-weight: bolder;
 }
