@@ -1,24 +1,22 @@
+// DOM Elements
 const hitBtn = document.getElementById("hitBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
-
-const deck = new CardDeck();
-let dealersCards;
-let dealerTotal;
-let playersCards;
-let playerTotal;
 const playersDiv = document.getElementById("playersCards");
 const dealersDiv = document.getElementById("dealersCards");
 const winnerDiv = document.getElementById("winner");
-let gameStatus;
+
+// Game Variables
+const deck = new CardDeck();
+let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 function endGame() {
   if (gameStatus === "inProgress") {
     gameStatus = "gameOver";
     playDealer();
-    document.getElementById("hitBtn").toggleAttribute("hidden");
-    document.getElementById("standBtn").toggleAttribute("hidden");
-    document.getElementById("newGameBtn").toggleAttribute("hidden");
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
+    newGameBtn.toggleAttribute("hidden");
 
     hitBtn.removeEventListener("click", hit);
     standBtn.removeEventListener("click", endGame);
@@ -50,7 +48,6 @@ function endGame() {
 }
 
 function calculateTotal(cards) {
-  //console.log(cards);
   let total = 0;
   let aces = 0;
   for (let i = 0; i < cards.length; i++) {
@@ -63,7 +60,6 @@ function calculateTotal(cards) {
     total -= 10;
     aces--;
   }
-  //console.log(total);
   return total;
 }
 
@@ -92,7 +88,7 @@ function hit(player) {
 }
 
 function playDealer() {
-  while (dealerTotal <= 16) {
+  while (dealerTotal < 17) {
     hit("dealer");
   }
 }
@@ -104,10 +100,15 @@ function checkStatus() {
 }
 
 function newGame() {
-  document.getElementById("newGameBtn").toggleAttribute("hidden");
-
+  newGameBtn.toggleAttribute("hidden");
   deck.newGame();
   initializeGame();
+}
+
+function clearDiv(div) {
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
+  }
 }
 
 function initializeGame() {
@@ -116,15 +117,9 @@ function initializeGame() {
   dealerTotal = 0;
   playerTotal = 0;
 
-  while (playersDiv.firstChild) {
-    playersDiv.removeChild(playersDiv.firstChild);
-  }
-  while (dealersDiv.firstChild) {
-    dealersDiv.removeChild(dealersDiv.firstChild);
-  }
-  while (winnerDiv.firstChild) {
-    winnerDiv.removeChild(winnerDiv.firstChild);
-  }
+  clearDiv(playersDiv);
+  clearDiv(dealersDiv);
+  clearDiv(winnerDiv);
 
   gameStatus = "inProgress";
 
@@ -134,8 +129,8 @@ function initializeGame() {
   }
 
   setTimeout(function () {
-    document.getElementById("hitBtn").toggleAttribute("hidden");
-    document.getElementById("standBtn").toggleAttribute("hidden");
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
   }, 50);
 
   hitBtn.addEventListener("click", hit);
