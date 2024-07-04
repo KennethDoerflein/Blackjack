@@ -117,7 +117,7 @@ function endGame() {
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
 
-    let winner = document.createElement("h3");
+    let winner = document.createElement("h4");
     let finalHandValues = document.createElement("p");
 
     if (playerTotal > 21) {

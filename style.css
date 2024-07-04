@@ -1,7 +1,7 @@
 img {
-  max-height: 10rem !important;
-  margin-right: -2.5rem;
-  margin-left: -2.5rem;
+  max-height: 100% !important;
+  margin-right: -1.8rem;
+  margin-left: -1.8rem;
 }
 #hitBtn {
   padding: 6px 22px 6px 22px;
@@ -9,18 +9,18 @@ img {
 #dealersCards,
 #playersCards {
   border: 1px solid #ccc;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 10px;
+  margin-bottom: 15px;
   border-radius: 5px;
-  max-height: 12.5rem !important;
+  max-height: 10rem !important;
+  min-height: 10rem !important;
+  height: 10em !important;
   max-width: 50rem;
-  min-height: 12.5rem !important;
-  height: 12.5rem !important;
 }
-#winner h3 {
+#winner h4 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
 }
 #winner {
-  height: 66px !important;
+  height: 40px !important;
 }
