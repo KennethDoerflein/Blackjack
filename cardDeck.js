@@ -1,12 +1,10 @@
 class Card {
-
   constructor(rank, suit, pointValue, image) {
     this.rank = rank;
     this.suit = suit;
     this.pointValue = pointValue;
     this.image = image;
   }
-
 }
 
 class CardDeck {
@@ -21,7 +19,7 @@ class CardDeck {
 
   createDeck() {
     let deck = [];
-    
+
     for (let rank of this.RANKS) {
       for (let suit of this.SUITS) {
         let pointValue = this.POINT_VALUES[this.RANKS.indexOf(rank)];
@@ -51,5 +49,4 @@ class CardDeck {
     }
     return this.cards.pop();
   }
-
 }
