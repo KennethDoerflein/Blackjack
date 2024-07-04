@@ -1,7 +1,7 @@
 img {
-  max-width: 25% !important;
-  margin-right: -10%;
-  margin-left: -10%;
+  max-height: 15rem !important;
+  margin-right: -4rem;
+  margin-left: -4rem;
 }
 #hitBtn {
   padding: 6px 22px 6px 22px;
@@ -12,6 +12,9 @@ img {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 5px;
+  max-height: 17.5rem !important;
+  min-height: 17.5rem !important;
+  height: 17.5rem !important;
 }
 #winner h3 {
   color: rgb(204, 58, 58);
