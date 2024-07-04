@@ -12,9 +12,9 @@ img {
   padding: 10px;
   margin-bottom: 15px;
   border-radius: 5px;
-  max-height: 10rem !important;
-  min-height: 10rem !important;
-  height: 10em !important;
+  max-height: 25% !important;
+  min-height: 25% !important;
+  height: 25% !important;
   max-width: 50rem;
 }
 #winner h4 {
@@ -23,4 +23,8 @@ img {
 }
 #winner {
   height: 40px !important;
+}
+#main {
+  max-height: 600px !important;
+  height: 600px !important;
 }
