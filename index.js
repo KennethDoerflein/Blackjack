@@ -28,12 +28,16 @@ function endGame() {
     dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
 
     let winner = document.createElement("h3");
-    if ((playerTotal > 21 || playerTotal < dealerTotal) && dealerTotal <= 21) {
+    if (playerTotal > 21) {
+      winner.textContent = "Player Busted, Dealer Wins";
+    } else if (dealerTotal > 21) {
+      winner.textContent = "Dealer Busted, Player Wins";
+    } else if (dealerTotal > playerTotal) {
       winner.textContent = "Dealer Wins";
-    } else if ((dealerTotal > 21 && playerTotal <= 21) || playerTotal > dealerTotal) {
-      winner.textContent = "You Win";
+    } else if (playerTotal > dealerTotal) {
+      winner.textContent = "Player Wins";
     } else {
-      winner.textContent = "It's a Tie";
+      winner.textContent = "Push (Tie)";
     }
     winnerDiv.appendChild(winner);
   }
