@@ -28,6 +28,8 @@ function endGame() {
     dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
 
     let winner = document.createElement("h3");
+    let finalHandValues = document.createElement("p");
+
     if (playerTotal > 21) {
       winner.textContent = "Player Busted, Dealer Wins";
     } else if (dealerTotal > 21) {
@@ -39,7 +41,11 @@ function endGame() {
     } else {
       winner.textContent = "Push (Tie)";
     }
+
+    finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+
     winnerDiv.appendChild(winner);
+    winnerDiv.appendChild(finalHandValues);
   }
 }
 
