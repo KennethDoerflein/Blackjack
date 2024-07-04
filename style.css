@@ -1,6 +1,7 @@
 img {
-  max-width: 15% !important;
-  margin: 0.15%;
+  max-width: 25% !important;
+  margin-right: -10%;
+  margin-left: -10%;
 }
 #hitBtn {
   padding: 6px 22px 6px 22px;
@@ -15,4 +16,7 @@ img {
 #winner h3 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
+}
+#winner {
+  height: 66px !important;
 }

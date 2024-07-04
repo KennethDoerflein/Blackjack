@@ -82,6 +82,7 @@ function addCard(player, cards, div) {
   }
   let img = document.createElement("img");
   img.src = imgPath;
+  img.classList.add("img-fluid");
   div.appendChild(img);
 }
 
