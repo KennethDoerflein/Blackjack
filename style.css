@@ -1,7 +1,7 @@
 img {
   max-height: 100% !important;
-  margin-right: -1.8rem;
-  margin-left: -1.8rem;
+  margin-right: calc(-4.5vh);
+  margin-left: calc(-4.5vh);
 }
 #hitBtn {
   padding: 6px 22px 6px 22px;
@@ -12,9 +12,9 @@ img {
   padding: 10px;
   margin-bottom: 15px;
   border-radius: 5px;
-  max-height: 25% !important;
-  min-height: 25% !important;
-  height: 25% !important;
+  max-height: 20vh !important;
+  min-height: 20vh !important;
+  height: 20vh !important;
   max-width: 50rem;
 }
 #winner h4 {
@@ -25,6 +25,6 @@ img {
   height: 40px !important;
 }
 #main {
-  max-height: 600px !important;
-  height: 600px !important;
+  max-height: 70vh !important;
+  height: 70vh !important;
 }
