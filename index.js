@@ -10,6 +10,9 @@ const winnerDiv = document.getElementById("winner");
 const deck = new CardDeck();
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
+// Start the game
+initializeGame();
+
 function initializeGame() {
   dealersCards = [];
   playersCards = [];
@@ -138,6 +141,3 @@ function endGame() {
     winnerDiv.appendChild(finalHandValues);
   }
 }
-
-// Start the game
-initializeGame();
