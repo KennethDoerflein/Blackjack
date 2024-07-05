@@ -85,7 +85,7 @@ function addCard(player, cards, div) {
   }
   let img = document.createElement("img");
   img.src = imgPath;
-  img.classList.add("img-fluid");
+  img.classList.add("img-fluid", "imgFlip");
   div.appendChild(img);
 }
 
@@ -118,7 +118,10 @@ function endGame() {
     newGameBtn.addEventListener("click", newGame);
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
+    dealerSecondCardImg.classList.remove("imgFlip");
+    void dealerSecondCardImg.offsetWidth;
     dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
+    dealerSecondCardImg.classList.add("imgFlip");
 
     let winner = document.createElement("h4");
     let finalHandValues = document.createElement("p");

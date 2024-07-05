@@ -3,8 +3,6 @@
   max-height: 100% !important;
   margin-right: calc(-4.5vh);
   margin-left: calc(-4.5vh);
-  animation: slideIn 0.8s ease-in-out, flip 0.8s ease-in-out;
-  transform-style: preserve-3d;
 }
 #hitBtn {
   padding: 6px 22px 6px 22px;
@@ -49,4 +47,8 @@
   to {
     transform: rotateY(0);
   }
+}
+.imgFlip {
+  animation: flip 0.8s ease-in-out;
+  transform-style: preserve-3d;
 }
