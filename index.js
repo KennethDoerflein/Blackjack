@@ -65,19 +65,20 @@ function checkStatus() {
   }
 }
 
-function playDealer() {
+async function playDealer() {
   while (dealerTotal < 17) {
     hit("dealer");
+    await new Promise((resolve) => setTimeout(resolve, animationDelay * 2));
   }
 }
 
-function hit(player) {
+async function hit(player) {
   if (player !== "dealer") {
     addCard(player, playersCards, playersDiv);
-    playerTotal = calculateTotal(playersCards);
+    playerTotal = await calculateTotal(playersCards);
   } else {
     addCard(player, dealersCards, dealersDiv);
-    dealerTotal = calculateTotal(dealersCards);
+    dealerTotal = await calculateTotal(dealersCards);
   }
   checkStatus();
 }
@@ -105,19 +106,21 @@ function addCard(player, cards, div) {
 }
 
 function calculateTotal(cards) {
-  let total = 0;
-  let aces = 0;
-  for (let i = 0; i < cards.length; i++) {
-    total += cards[i].pointValue;
-    if (cards[i].rank === "ace") {
-      aces++;
+  return new Promise((resolve) => {
+    let total = 0;
+    let aces = 0;
+    for (let i = 0; i < cards.length; i++) {
+      total += cards[i].pointValue;
+      if (cards[i].rank === "ace") {
+        aces++;
+      }
     }
-  }
-  while (total > 21 && aces > 0) {
-    total -= 10;
-    aces--;
-  }
-  return total;
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    resolve(total);
+  });
 }
 
 function endGame() {
@@ -135,8 +138,8 @@ function endGame() {
     dealerSecondCardImg.classList.remove("imgSlide");
     let imgPath = `./cards-1.3/${dealersCards[1].image}`;
     flipCard(dealerSecondCardImg, imgPath);
-    setTimeout(() => {
-      playDealer();
+    setTimeout(async () => {
+      await playDealer();
       let winner = document.createElement("h4");
       let finalHandValues = document.createElement("p");
 
