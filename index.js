@@ -8,7 +8,9 @@ const winnerDiv = document.getElementById("winner");
 
 // Game Variables
 const deck = new CardDeck();
-const animationDelay = 500;
+const flipDelay = 800;
+const slideDelay = 400;
+const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
@@ -38,10 +40,10 @@ function clearGameBoard() {
 
 function initialDeal() {
   hit();
-  setTimeout(() => hit("dealer"), animationDelay * 2);
-  setTimeout(() => hit(), animationDelay * 4);
-  setTimeout(() => hit("dealer"), animationDelay * 6);
-  setTimeout(() => toggleGameButtons(), animationDelay * 7.2);
+  setTimeout(() => hit("dealer"), animationDelay);
+  setTimeout(() => hit(), animationDelay * 2);
+  setTimeout(() => hit("dealer"), animationDelay * 3);
+  setTimeout(() => toggleGameButtons(), animationDelay * 3.6);
 }
 
 function toggleGameButtons() {
@@ -76,7 +78,7 @@ function checkStatus() {
 async function playDealer() {
   while (dealerTotal < 17) {
     hit("dealer");
-    await new Promise((resolve) => setTimeout(resolve, animationDelay * 2));
+    await new Promise((resolve) => setTimeout(resolve, animationDelay));
   }
 }
 
@@ -114,7 +116,7 @@ function addCard(player, cards, div) {
     let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
     setTimeout(() => {
       flipCard(img, imgPath);
-    }, animationDelay);
+    }, slideDelay);
   }
 }
 
