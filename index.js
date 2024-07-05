@@ -106,7 +106,10 @@ function addCard(player, cards, div) {
   div.appendChild(img);
 
   img.offsetHeight;
-  img.classList.add("imgSlide");
+
+  requestAnimationFrame(() => {
+    img.classList.add("imgSlide");
+  });
 
   if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
     let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
