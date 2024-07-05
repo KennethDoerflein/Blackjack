@@ -15,33 +15,40 @@ let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 initializeGame();
 
 function initializeGame() {
+  resetGameVariables();
+  clearGameBoard();
+  initialDeal();
+  setupEventListeners();
+}
+
+function resetGameVariables() {
   dealersCards = [];
   playersCards = [];
   dealerTotal = 0;
   playerTotal = 0;
+  gameStatus = "inProgress";
+}
 
+function clearGameBoard() {
   clearDiv(playersDiv);
   clearDiv(dealersDiv);
   clearDiv(winnerDiv);
+}
 
-  gameStatus = "inProgress";
-
+function initialDeal() {
   hit();
-  setTimeout(() => {
-    hit("dealer");
-  }, animationDelay * 2);
-  setTimeout(() => {
-    hit();
-  }, animationDelay * 4);
-  setTimeout(() => {
-    hit("dealer");
-  }, animationDelay * 6);
+  setTimeout(() => hit("dealer"), animationDelay * 2);
+  setTimeout(() => hit(), animationDelay * 4);
+  setTimeout(() => hit("dealer"), animationDelay * 6);
+  setTimeout(() => toggleGameButtons(), animationDelay * 7.2);
+}
 
-  setTimeout(function () {
-    hitBtn.toggleAttribute("hidden");
-    standBtn.toggleAttribute("hidden");
-  }, animationDelay * 7.2);
+function toggleGameButtons() {
+  hitBtn.toggleAttribute("hidden");
+  standBtn.toggleAttribute("hidden");
+}
 
+function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
