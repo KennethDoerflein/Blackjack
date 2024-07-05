@@ -12,8 +12,9 @@ const animationDelay = 500;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
-initializeGame();
-
+window.onload = () => {
+  initializeGame();
+};
 function initializeGame() {
   resetGameVariables();
   clearGameBoard();
@@ -103,13 +104,11 @@ function addCard(player, cards, div) {
   img.src = imgPath;
 
   img.classList.add("img-fluid");
-  div.appendChild(img);
+  img.onload = () => {
+    div.appendChild(img);
+  };
 
-  img.offsetHeight;
-
-  requestAnimationFrame(() => {
-    img.classList.add("imgSlide");
-  });
+  img.classList.add("imgSlide");
 
   if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
     let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
