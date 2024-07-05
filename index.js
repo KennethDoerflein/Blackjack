@@ -12,7 +12,7 @@ const animationDelay = 500;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
-initializeGame();
+setTimeout(() => initializeGame(), animationDelay * 2);
 
 function initializeGame() {
   resetGameVariables();
