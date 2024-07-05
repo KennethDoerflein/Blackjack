@@ -12,7 +12,7 @@ const animationDelay = 500;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
-setTimeout(() => initializeGame(), animationDelay * 2);
+initializeGame();
 
 function initializeGame() {
   resetGameVariables();
@@ -101,8 +101,12 @@ function addCard(player, cards, div) {
   let imgPath = "./cards-1.3/back.png";
   let img = document.createElement("img");
   img.src = imgPath;
-  img.classList.add("img-fluid", "imgSlide");
+
+  img.classList.add("img-fluid");
   div.appendChild(img);
+
+  img.offsetHeight;
+  img.classList.add("imgSlide");
 
   if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
     let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
