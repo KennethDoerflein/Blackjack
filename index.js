@@ -8,6 +8,7 @@ const winnerDiv = document.getElementById("winner");
 
 // Game Variables
 const deck = new CardDeck();
+const animationDelay = 500;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
@@ -25,15 +26,21 @@ function initializeGame() {
 
   gameStatus = "inProgress";
 
-  for (let i = 0; i < 2; i++) {
-    hit();
+  hit();
+  setTimeout(() => {
     hit("dealer");
-  }
+  }, animationDelay * 2);
+  setTimeout(() => {
+    hit();
+  }, animationDelay * 4);
+  setTimeout(() => {
+    hit("dealer");
+  }, animationDelay * 6);
 
   setTimeout(function () {
     hitBtn.toggleAttribute("hidden");
     standBtn.toggleAttribute("hidden");
-  }, 50);
+  }, animationDelay * 7.2);
 
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
@@ -75,18 +82,26 @@ function hit(player) {
   checkStatus();
 }
 
+function flipCard(cardImg, imgPath) {
+  cardImg.classList.remove("imgSlide");
+  cardImg.src = imgPath;
+  cardImg.classList.add("imgFlip");
+}
+
 function addCard(player, cards, div) {
   cards.push(deck.getCard());
-  let imgPath;
-  if (player !== "dealer" || cards.length === 1 || gameStatus !== "inProgress") {
-    imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
-  } else {
-    imgPath = "./cards-1.3/back.png";
-  }
+  let imgPath = "./cards-1.3/back.png";
   let img = document.createElement("img");
   img.src = imgPath;
-  img.classList.add("img-fluid", "imgFlip");
+  img.classList.add("img-fluid", "imgSlide");
   div.appendChild(img);
+
+  if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
+    let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
+    setTimeout(() => {
+      flipCard(img, imgPath);
+    }, animationDelay);
+  }
 }
 
 function calculateTotal(cards) {
@@ -108,7 +123,6 @@ function calculateTotal(cards) {
 function endGame() {
   if (gameStatus === "inProgress") {
     gameStatus = "gameOver";
-    playDealer();
     hitBtn.toggleAttribute("hidden");
     standBtn.toggleAttribute("hidden");
     newGameBtn.toggleAttribute("hidden");
@@ -118,29 +132,30 @@ function endGame() {
     newGameBtn.addEventListener("click", newGame);
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
-    dealerSecondCardImg.classList.remove("imgFlip");
-    void dealerSecondCardImg.offsetWidth;
-    dealerSecondCardImg.src = `./cards-1.3/${dealersCards[1].image}`;
-    dealerSecondCardImg.classList.add("imgFlip");
+    dealerSecondCardImg.classList.remove("imgSlide");
+    let imgPath = `./cards-1.3/${dealersCards[1].image}`;
+    flipCard(dealerSecondCardImg, imgPath);
+    setTimeout(() => {
+      playDealer();
+      let winner = document.createElement("h4");
+      let finalHandValues = document.createElement("p");
 
-    let winner = document.createElement("h4");
-    let finalHandValues = document.createElement("p");
+      if (playerTotal > 21) {
+        winner.textContent = "Player Busted, Dealer Wins";
+      } else if (dealerTotal > 21) {
+        winner.textContent = "Dealer Busted, Player Wins";
+      } else if (dealerTotal > playerTotal) {
+        winner.textContent = "Dealer Wins";
+      } else if (playerTotal > dealerTotal) {
+        winner.textContent = "Player Wins";
+      } else {
+        winner.textContent = "Push (Tie)";
+      }
 
-    if (playerTotal > 21) {
-      winner.textContent = "Player Busted, Dealer Wins";
-    } else if (dealerTotal > 21) {
-      winner.textContent = "Dealer Busted, Player Wins";
-    } else if (dealerTotal > playerTotal) {
-      winner.textContent = "Dealer Wins";
-    } else if (playerTotal > dealerTotal) {
-      winner.textContent = "Player Wins";
-    } else {
-      winner.textContent = "Push (Tie)";
-    }
+      finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
 
-    finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
-
-    winnerDiv.appendChild(winner);
-    winnerDiv.appendChild(finalHandValues);
+      winnerDiv.appendChild(winner);
+      winnerDiv.appendChild(finalHandValues);
+    }, animationDelay);
   }
 }
