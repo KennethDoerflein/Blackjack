@@ -1,4 +1,5 @@
-img {
+#dealersCards img,
+#playersCards img {
   max-height: 100% !important;
   margin-right: calc(-4.5vh);
   margin-left: calc(-4.5vh);
@@ -11,11 +12,13 @@ img {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 15px;
+  padding-left: calc(5.6vh);
   border-radius: 5px;
   max-height: 20vh !important;
   min-height: 20vh !important;
   height: 20vh !important;
   max-width: 50rem;
+  background-color: rgb(9, 59, 9);
 }
 #winner h4 {
   color: rgb(204, 58, 58);
@@ -27,4 +30,25 @@ img {
 #main {
   max-height: 70vh !important;
   height: 70vh !important;
+}
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes flip {
+  from {
+    transform: rotateY(90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+.imgFlip {
+  animation: flip 0.8s ease-in-out;
+  transform-style: preserve-3d;
 }
