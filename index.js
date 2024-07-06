@@ -72,19 +72,6 @@ function newGame() {
   initializeGame();
 }
 
-function checkStatus() {
-  if (playerTotal > 21 || dealerTotal > 21) {
-    endGame();
-  }
-}
-
-async function playDealer() {
-  while (dealerTotal < 17) {
-    hit("dealer");
-    await new Promise((resolve) => setTimeout(resolve, animationDelay));
-  }
-}
-
 async function hit(player) {
   if (player !== "dealer") {
     addCard(player, playersCards, playersDiv);
@@ -93,15 +80,7 @@ async function hit(player) {
     addCard(player, dealersCards, dealersDiv);
     dealerTotal = await calculateTotal(dealersCards);
   }
-  checkStatus();
-}
-
-function flipCard(cardImg, imgPath) {
-  cardImg.classList.remove("imgSlide");
-  cardImg.src = imgPath;
-  cardImg.onload = () => {
-    cardImg.classList.add("imgFlip");
-  };
+  checkStatus("hit");
 }
 
 function addCard(player, cards, div) {
@@ -125,6 +104,14 @@ function addCard(player, cards, div) {
   }
 }
 
+function flipCard(cardImg, imgPath) {
+  cardImg.classList.remove("imgSlide");
+  cardImg.src = imgPath;
+  cardImg.onload = () => {
+    cardImg.classList.add("imgFlip");
+  };
+}
+
 function calculateTotal(cards) {
   return new Promise((resolve) => {
     let total = 0;
@@ -143,7 +130,20 @@ function calculateTotal(cards) {
   });
 }
 
-function endGame() {
+function checkStatus(type) {
+  if (playerTotal > 21 || dealerTotal > 21) {
+    endGame(type);
+  }
+}
+
+async function playDealer() {
+  while (dealerTotal < 17) {
+    hit("dealer");
+    await new Promise((resolve) => setTimeout(resolve, animationDelay));
+  }
+}
+
+function endGame(type) {
   if (gameStatus === "inProgress") {
     gameStatus = "gameOver";
     hitBtn.toggleAttribute("hidden");
@@ -154,31 +154,39 @@ function endGame() {
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     dealerSecondCardImg.classList.remove("imgSlide");
     let imgPath = `./cards-1.3/${dealersCards[1].image}`;
-    flipCard(dealerSecondCardImg, imgPath);
-
+    if (type !== "hit") {
+      flipCard(dealerSecondCardImg, imgPath);
+    } else {
+      setTimeout(() => flipCard(dealerSecondCardImg, imgPath), animationDelay);
+    }
+    const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
       await playDealer();
-      let winner = document.createElement("h4");
-      let finalHandValues = document.createElement("p");
-
-      if (playerTotal > 21) {
-        winner.textContent = "Player Busted, Dealer Wins";
-      } else if (dealerTotal > 21) {
-        winner.textContent = "Dealer Busted, Player Wins";
-      } else if (dealerTotal > playerTotal) {
-        winner.textContent = "Dealer Wins";
-      } else if (playerTotal > dealerTotal) {
-        winner.textContent = "Player Wins";
-      } else {
-        winner.textContent = "Push (Tie)";
-      }
-
-      finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
-
-      winnerDiv.appendChild(winner);
-      winnerDiv.appendChild(finalHandValues);
-
-      newGameBtn.toggleAttribute("hidden");
-    }, flipDelay);
+      displayWinner();
+    }, modifiedDelay);
   }
+}
+
+function displayWinner() {
+  let winner = document.createElement("h4");
+  let finalHandValues = document.createElement("p");
+
+  if (playerTotal > 21) {
+    winner.textContent = "Player Busted, Dealer Wins";
+  } else if (dealerTotal > 21) {
+    winner.textContent = "Dealer Busted, Player Wins";
+  } else if (dealerTotal > playerTotal) {
+    winner.textContent = "Dealer Wins";
+  } else if (playerTotal > dealerTotal) {
+    winner.textContent = "Player Wins";
+  } else {
+    winner.textContent = "Push (Tie)";
+  }
+
+  finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+
+  winnerDiv.appendChild(winner);
+  winnerDiv.appendChild(finalHandValues);
+
+  newGameBtn.toggleAttribute("hidden");
 }
