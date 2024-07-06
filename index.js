@@ -141,43 +141,42 @@ function calculateTotal(cards) {
 }
 
 function endGame() {
-  setTimeout(() => {
-    if (gameStatus === "inProgress") {
-      gameStatus = "gameOver";
-      hitBtn.toggleAttribute("hidden");
-      standBtn.toggleAttribute("hidden");
+  if (gameStatus === "inProgress") {
+    gameStatus = "gameOver";
+    hitBtn.toggleAttribute("hidden");
+    standBtn.toggleAttribute("hidden");
+    hitBtn.removeEventListener("click", hit);
+    standBtn.removeEventListener("click", endGame);
+
+    let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
+    dealerSecondCardImg.classList.remove("imgSlide");
+    let imgPath = `./cards-1.3/${dealersCards[1].image}`;
+    flipCard(dealerSecondCardImg, imgPath);
+
+    setTimeout(async () => {
+      await playDealer();
+      let winner = document.createElement("h4");
+      let finalHandValues = document.createElement("p");
+
+      if (playerTotal > 21) {
+        winner.textContent = "Player Busted, Dealer Wins";
+      } else if (dealerTotal > 21) {
+        winner.textContent = "Dealer Busted, Player Wins";
+      } else if (dealerTotal > playerTotal) {
+        winner.textContent = "Dealer Wins";
+      } else if (playerTotal > dealerTotal) {
+        winner.textContent = "Player Wins";
+      } else {
+        winner.textContent = "Push (Tie)";
+      }
+
+      finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+
+      winnerDiv.appendChild(winner);
+      winnerDiv.appendChild(finalHandValues);
+
       newGameBtn.toggleAttribute("hidden");
-
-      hitBtn.removeEventListener("click", hit);
-      standBtn.removeEventListener("click", endGame);
       newGameBtn.addEventListener("click", newGame);
-
-      let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
-      dealerSecondCardImg.classList.remove("imgSlide");
-      let imgPath = `./cards-1.3/${dealersCards[1].image}`;
-      flipCard(dealerSecondCardImg, imgPath);
-      setTimeout(async () => {
-        await playDealer();
-        let winner = document.createElement("h4");
-        let finalHandValues = document.createElement("p");
-
-        if (playerTotal > 21) {
-          winner.textContent = "Player Busted, Dealer Wins";
-        } else if (dealerTotal > 21) {
-          winner.textContent = "Dealer Busted, Player Wins";
-        } else if (dealerTotal > playerTotal) {
-          winner.textContent = "Dealer Wins";
-        } else if (playerTotal > dealerTotal) {
-          winner.textContent = "Player Wins";
-        } else {
-          winner.textContent = "Push (Tie)";
-        }
-
-        finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
-
-        winnerDiv.appendChild(winner);
-        winnerDiv.appendChild(finalHandValues);
-      }, animationDelay);
-    }
-  }, flipDelay);
+    }, flipDelay);
+  }
 }

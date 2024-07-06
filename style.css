@@ -50,9 +50,9 @@
 }
 .imgFlip {
   animation: flip 0.7s ease-in-out;
-  transform-style: preserve-3d;
+  transform-style: flat;
 }
 .imgSlide {
   animation: slideIn 0.3s ease-in-out;
-  transform-style: preserve-3d;
+  transform-style: flat;
 }
