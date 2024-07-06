@@ -8,8 +8,8 @@ const winnerDiv = document.getElementById("winner");
 
 // Game Variables
 const deck = new CardDeck();
-const flipDelay = 800;
-const slideDelay = 400;
+const flipDelay = 700;
+const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
@@ -96,7 +96,9 @@ async function hit(player) {
 function flipCard(cardImg, imgPath) {
   cardImg.classList.remove("imgSlide");
   cardImg.src = imgPath;
-  cardImg.classList.add("imgFlip");
+  cardImg.onload = () => {
+    cardImg.classList.add("imgFlip");
+  };
 }
 
 function addCard(player, cards, div) {
@@ -139,41 +141,43 @@ function calculateTotal(cards) {
 }
 
 function endGame() {
-  if (gameStatus === "inProgress") {
-    gameStatus = "gameOver";
-    hitBtn.toggleAttribute("hidden");
-    standBtn.toggleAttribute("hidden");
-    newGameBtn.toggleAttribute("hidden");
+  setTimeout(() => {
+    if (gameStatus === "inProgress") {
+      gameStatus = "gameOver";
+      hitBtn.toggleAttribute("hidden");
+      standBtn.toggleAttribute("hidden");
+      newGameBtn.toggleAttribute("hidden");
 
-    hitBtn.removeEventListener("click", hit);
-    standBtn.removeEventListener("click", endGame);
-    newGameBtn.addEventListener("click", newGame);
+      hitBtn.removeEventListener("click", hit);
+      standBtn.removeEventListener("click", endGame);
+      newGameBtn.addEventListener("click", newGame);
 
-    let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
-    dealerSecondCardImg.classList.remove("imgSlide");
-    let imgPath = `./cards-1.3/${dealersCards[1].image}`;
-    flipCard(dealerSecondCardImg, imgPath);
-    setTimeout(async () => {
-      await playDealer();
-      let winner = document.createElement("h4");
-      let finalHandValues = document.createElement("p");
+      let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
+      dealerSecondCardImg.classList.remove("imgSlide");
+      let imgPath = `./cards-1.3/${dealersCards[1].image}`;
+      flipCard(dealerSecondCardImg, imgPath);
+      setTimeout(async () => {
+        await playDealer();
+        let winner = document.createElement("h4");
+        let finalHandValues = document.createElement("p");
 
-      if (playerTotal > 21) {
-        winner.textContent = "Player Busted, Dealer Wins";
-      } else if (dealerTotal > 21) {
-        winner.textContent = "Dealer Busted, Player Wins";
-      } else if (dealerTotal > playerTotal) {
-        winner.textContent = "Dealer Wins";
-      } else if (playerTotal > dealerTotal) {
-        winner.textContent = "Player Wins";
-      } else {
-        winner.textContent = "Push (Tie)";
-      }
+        if (playerTotal > 21) {
+          winner.textContent = "Player Busted, Dealer Wins";
+        } else if (dealerTotal > 21) {
+          winner.textContent = "Dealer Busted, Player Wins";
+        } else if (dealerTotal > playerTotal) {
+          winner.textContent = "Dealer Wins";
+        } else if (playerTotal > dealerTotal) {
+          winner.textContent = "Player Wins";
+        } else {
+          winner.textContent = "Push (Tie)";
+        }
 
-      finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+        finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
 
-      winnerDiv.appendChild(winner);
-      winnerDiv.appendChild(finalHandValues);
-    }, animationDelay);
-  }
+        winnerDiv.appendChild(winner);
+        winnerDiv.appendChild(finalHandValues);
+      }, animationDelay);
+    }
+  }, flipDelay);
 }
