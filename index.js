@@ -13,10 +13,13 @@ const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
-// Start the game
-window.onload = () => {
-  initializeGame();
-};
+// // Start the game
+// window.onload = () => {
+//   initializeGame();
+// };
+
+setupEventListeners();
+
 function initializeGame() {
   resetGameVariables();
   clearGameBoard();
@@ -54,7 +57,7 @@ function toggleGameButtons() {
 function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
-  newGameBtn.removeEventListener("click", newGame);
+  newGameBtn.addEventListener("click", newGame);
 }
 
 function clearDiv(div) {
@@ -176,7 +179,6 @@ function endGame() {
       winnerDiv.appendChild(finalHandValues);
 
       newGameBtn.toggleAttribute("hidden");
-      newGameBtn.addEventListener("click", newGame);
     }, flipDelay);
   }
 }
