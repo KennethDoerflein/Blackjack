@@ -37,6 +37,7 @@ function initializeGame() {
     clearGameBoard();
     initialDeal();
     setupEventListeners();
+    updatePoints();
   }
 }
 
