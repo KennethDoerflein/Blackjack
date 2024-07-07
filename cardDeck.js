@@ -15,6 +15,7 @@ class CardDeck {
     this.POINT_VALUES = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
 
     this.cards = this.createDeck();
+    this.preloadImages();
     this.shuffle();
   }
 
@@ -31,6 +32,16 @@ class CardDeck {
     return deck;
   }
 
+  preloadImages() {
+    let images = this.cards.map((card) => `./cards-1.3/${card.image}`);
+
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {};
+    });
+  }
+
   shuffle() {
     // Durstenfeld shuffle
     for (let i = this.cards.length - 1; i > 0; i--) {
@@ -41,6 +52,7 @@ class CardDeck {
 
   newGame() {
     this.cards = this.createDeck();
+    this.preloadImages();
     this.shuffle();
   }
 
