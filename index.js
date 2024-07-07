@@ -120,6 +120,7 @@ function updatePoints() {
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
+
 async function hit(player = "player") {
   if (player !== "dealer") {
     await addCard(playersCards, playersDiv, player);
