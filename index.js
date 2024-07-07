@@ -15,6 +15,10 @@ let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
 // Start the game
 window.onload = () => {
+  let message = document.createElement("h4");
+  message.textContent = "Game is loading!";
+  winnerDiv.appendChild(message);
+
   setTimeout(() => initializeGame(), animationDelay);
 };
 
@@ -46,7 +50,12 @@ function initialDeal() {
   setTimeout(() => hit("dealer"), animationDelay);
   setTimeout(() => hit(), animationDelay * 2);
   setTimeout(() => hit("dealer"), animationDelay * 3);
-  setTimeout(() => toggleGameButtons(), animationDelay * 3.6);
+  setTimeout(() => {
+    toggleGameButtons();
+    let message = document.createElement("h4");
+    message.textContent = "Your Turn!";
+    winnerDiv.appendChild(message);
+  }, animationDelay * 3.6);
 }
 
 function toggleGameButtons() {
@@ -145,6 +154,11 @@ async function playDealer() {
 
 function endGame(type) {
   if (gameStatus === "inProgress") {
+    winnerDiv.removeChild(winnerDiv.firstChild);
+    let message = document.createElement("h4");
+    message.textContent = "Dealer's Turn!";
+    winnerDiv.appendChild(message);
+
     gameStatus = "gameOver";
     hitBtn.toggleAttribute("hidden");
     standBtn.toggleAttribute("hidden");
@@ -162,6 +176,7 @@ function endGame(type) {
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
       await playDealer();
+      winnerDiv.removeChild(message);
       displayWinner();
     }, modifiedDelay);
   }
