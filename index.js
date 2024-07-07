@@ -13,7 +13,14 @@ const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 
-// // Start the game
+// Force Repaint
+function forceRepaint(element) {
+  element.style.display = "none";
+  element.offsetHeight; // Trigger a reflow
+  element.style.display = "";
+}
+
+// Start the game
 // window.onload = () => {
 //   initializeGame();
 // };
@@ -25,6 +32,8 @@ function initializeGame() {
   clearGameBoard();
   initialDeal();
   setupEventListeners();
+  forceRepaint(playersDiv);
+  forceRepaint(dealersDiv);
 }
 
 function resetGameVariables() {
