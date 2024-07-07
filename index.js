@@ -5,6 +5,11 @@ const newGameBtn = document.getElementById("newGameBtn");
 const playersDiv = document.getElementById("playersCards");
 const dealersDiv = document.getElementById("dealersCards");
 const winnerDiv = document.getElementById("winner");
+const pointsDisplay = document.getElementById("pointsDisplay");
+const wagerDisplay = document.getElementById("wagerDisplay");
+const wagerInput = document.getElementById("wagerInput");
+const wagerBtn = document.getElementById("wagerBtn");
+const bottomDiv = document.getElementById("bottomDiv");
 
 // Game Variables
 const deck = new CardDeck();
@@ -12,6 +17,8 @@ const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
+let playerPoints = 100;
+let currentWager = 0;
 
 // Start the game
 window.onload = () => {
@@ -19,16 +26,18 @@ window.onload = () => {
   message.textContent = "Game is loading!";
   winnerDiv.appendChild(message);
 
-  setTimeout(() => initializeGame(), animationDelay);
+  setTimeout(() => initializeGame(), animationDelay * 1.5);
 };
 
 setupEventListeners();
 
 function initializeGame() {
-  resetGameVariables();
-  clearGameBoard();
-  initialDeal();
-  setupEventListeners();
+  if (playerPoints !== 0) {
+    resetGameVariables();
+    clearGameBoard();
+    initialDeal();
+    setupEventListeners();
+  }
 }
 
 function resetGameVariables() {
@@ -51,7 +60,7 @@ function initialDeal() {
   setTimeout(() => hit(), animationDelay * 2);
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
-    toggleGameButtons();
+    toggleWagerElements();
     let message = document.createElement("h4");
     message.textContent = "Your Turn!";
     winnerDiv.appendChild(message);
@@ -63,10 +72,16 @@ function toggleGameButtons() {
   standBtn.toggleAttribute("hidden");
 }
 
+function toggleWagerElements() {
+  wagerInput.toggleAttribute("hidden");
+  wagerBtn.toggleAttribute("hidden");
+}
+
 function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
+  wagerBtn.addEventListener("click", placeWager);
 }
 
 function clearDiv(div) {
@@ -79,6 +94,29 @@ function newGame() {
   newGameBtn.toggleAttribute("hidden");
   deck.newGame();
   initializeGame();
+}
+
+function placeWager() {
+  currentWager = parseInt(wagerInput.value);
+  if (!isNaN(currentWager)) {
+    if (currentWager > playerPoints) {
+      alert("You don't have enough points to place that wager.\nThe input value was changed to how many points you have left.");
+      wagerInput.value = playerPoints;
+      return;
+    }
+    playerPoints -= currentWager;
+    wagerInput.value = "";
+    updatePoints();
+    toggleGameButtons();
+    toggleWagerElements();
+  } else {
+    alert("You need to enter a point value to wager.");
+  }
+}
+
+function updatePoints() {
+  pointsDisplay.textContent = "Points: " + playerPoints;
+  wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
 async function hit(player) {
@@ -190,18 +228,30 @@ function displayWinner() {
     winner.textContent = "Player Busted, Dealer Wins";
   } else if (dealerTotal > 21) {
     winner.textContent = "Dealer Busted, Player Wins";
+    playerPoints += currentWager * 2;
   } else if (dealerTotal > playerTotal) {
     winner.textContent = "Dealer Wins";
   } else if (playerTotal > dealerTotal) {
     winner.textContent = "Player Wins";
+    playerPoints += currentWager * 2;
   } else {
     winner.textContent = "Push (Tie)";
+    playerPoints += currentWager;
   }
 
   finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+  pointsDisplay.textContent = `Points: ${playerPoints}`;
 
   winnerDiv.appendChild(winner);
   winnerDiv.appendChild(finalHandValues);
 
-  newGameBtn.toggleAttribute("hidden");
+  currentWager = 0;
+  updatePoints();
+  if (playerPoints === 0) {
+    let message = document.createElement("h4");
+    message.textContent = "You are out of points, thank you for playing!";
+    bottomDiv.appendChild(message);
+  } else {
+    newGameBtn.toggleAttribute("hidden");
+  }
 }
