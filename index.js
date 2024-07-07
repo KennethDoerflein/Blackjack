@@ -119,36 +119,44 @@ function updatePoints() {
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
-async function hit(player) {
+async function hit(player = "player") {
   if (player !== "dealer") {
-    addCard(player, playersCards, playersDiv);
+    await addCard(playersCards, playersDiv, player);
     playerTotal = await calculateTotal(playersCards);
   } else {
-    addCard(player, dealersCards, dealersDiv);
+    await addCard(dealersCards, dealersDiv, player);
     dealerTotal = await calculateTotal(dealersCards);
   }
+  await new Promise((resolve) => setTimeout(resolve, 100));
   checkStatus("hit");
 }
 
-function addCard(player, cards, div) {
-  cards.push(deck.getCard());
+function addCard(cards, div, player) {
+  const card = deck.getCard();
+  cards.push(card);
+
   let imgPath = "./cards-1.3/back.png";
   let img = document.createElement("img");
   img.src = imgPath;
-
   img.classList.add("img-fluid");
-  img.onload = () => {
-    div.appendChild(img);
-  };
 
-  img.classList.add("imgSlide");
-
-  if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
-    let imgPath = `./cards-1.3/${cards[cards.length - 1].image}`;
-    setTimeout(() => {
-      flipCard(img, imgPath);
-    }, slideDelay);
-  }
+  return new Promise((resolve) => {
+    img.onload = () => {
+      div.appendChild(img);
+      img.classList.add("imgSlide");
+      if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
+        let finalImgPath = `./cards-1.3/${card.image}`;
+        setTimeout(() => {
+          img.classList.remove("imgSlide");
+          img.src = finalImgPath;
+          img.onload = () => {
+            flipCard(img, finalImgPath);
+            resolve();
+          };
+        }, slideDelay);
+      }
+    };
+  });
 }
 
 function flipCard(cardImg, imgPath) {
