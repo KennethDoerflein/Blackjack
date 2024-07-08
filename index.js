@@ -116,7 +116,7 @@ function placeWager() {
 }
 
 function updatePoints() {
-  pointsDisplay.textContent = "Points: " + playerPoints;
+  pointsDisplay.textContent = "Points*: " + playerPoints;
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
@@ -249,7 +249,6 @@ function displayWinner() {
   }
 
   finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
-  pointsDisplay.textContent = `Points: ${playerPoints}`;
 
   winnerDiv.appendChild(winner);
   winnerDiv.appendChild(finalHandValues);
