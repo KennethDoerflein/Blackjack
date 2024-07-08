@@ -4,9 +4,16 @@
   margin-right: calc(-4.5vh);
   margin-left: calc(-4.5vh);
 }
+
 #hitBtn {
   padding: 6px 22px 6px 22px;
+  font-weight: bold;
 }
+
+#standBtn {
+  font-weight: bold;
+}
+
 #dealersCards,
 #playersCards {
   border: 1px solid #ccc;
@@ -20,17 +27,34 @@
   max-width: 50rem;
   background-color: rgb(9, 59, 9);
 }
+
 #winner h4 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
 }
+
 #winner {
   height: 40px !important;
 }
+
 #main {
   max-height: 70vh !important;
   height: 70vh !important;
 }
+
+#pointsDisplay,
+#wagerDisplay {
+  max-height: 4.6vh !important;
+  height: 4.6vh !important;
+  font-size: 1.6vh;
+  font-weight: bold;
+}
+
+#wagerDiv .form-control,
+#wagerBtn {
+  max-width: 120px;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(-100%);
@@ -48,6 +72,7 @@
     transform: rotateY(0);
   }
 }
+
 @-webkit-keyframes slideIn {
   from {
     transform: translateX(-100%);
