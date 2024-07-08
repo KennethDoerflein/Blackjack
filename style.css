@@ -55,6 +55,16 @@
   max-width: 120px;
 }
 
+#disclaimer p {
+  font-size: 0.65rem;
+}
+
+#disclaimer {
+  width: fit-content;
+  border-radius: 25px;
+  height: fit-content;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(-100%);

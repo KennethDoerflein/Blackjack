@@ -99,19 +99,22 @@ function newGame() {
 
 function placeWager() {
   currentWager = parseInt(wagerInput.value);
-  if (!isNaN(currentWager)) {
+
+  if (!isNaN(currentWager) && currentWager > 0) {
     if (currentWager > playerPoints) {
-      alert("You don't have enough points to place that wager.\nThe input value was changed to how many points you have left.");
+      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
       wagerInput.value = playerPoints;
       return;
     }
+
     playerPoints -= currentWager;
     wagerInput.value = "";
     updatePoints();
+
     toggleGameButtons();
     toggleWagerElements();
   } else {
-    alert("You need to enter a point value to wager.");
+    alert("Please enter a valid point value to wager. It must be a positive number.");
   }
 }
 
@@ -258,6 +261,7 @@ function displayWinner() {
   if (playerPoints === 0) {
     let message = document.createElement("h4");
     message.textContent = "You are out of points, thank you for playing!";
+    message.classList.add("mb-5");
     bottomDiv.appendChild(message);
   } else {
     newGameBtn.toggleAttribute("hidden");
