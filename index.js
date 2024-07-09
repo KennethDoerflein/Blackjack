@@ -102,16 +102,7 @@ function setupEventListeners() {
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
-  musicButton.addEventListener("click", function () {
-    console.log(backgroundMusic.paused);
-    if (backgroundMusic.paused) {
-      backgroundMusic.play();
-      musicButton.textContent = "🔇";
-    } else {
-      backgroundMusic.pause();
-      musicButton.textContent = "🎵";
-    }
-  });
+  musicButton.addEventListener("click", toggleMusic);
 }
 
 function clearDiv(div) {
