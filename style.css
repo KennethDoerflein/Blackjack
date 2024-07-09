@@ -65,10 +65,11 @@
 }
 
 #musicButton {
-  font-size: 10px;
+  font-size: 16px;
   padding: 0px;
-  height: 20px;
-  width: 20px;
+  height: 25px;
+  width: 25px;
+  background-color: rgb(99, 109, 116);
 }
 
 @keyframes slideIn {

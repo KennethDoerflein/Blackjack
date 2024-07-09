@@ -21,6 +21,7 @@ const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 let playerPoints = 100;
 let currentWager = 0;
+let userChangedMusic = false;
 
 // Start the game
 window.onload = () => {
@@ -28,7 +29,11 @@ window.onload = () => {
   message.textContent = "Game is loading!";
   winnerDiv.appendChild(message);
 
-  setTimeout(() => initializeGame(), animationDelay * 1.5);
+  setTimeout(() => {
+    setupEventListeners();
+    newGameBtn.toggleAttribute("hidden");
+    message.textContent = "Game is ready!";
+  }, animationDelay * 1.5);
 };
 
 function initializeGame() {
@@ -95,6 +100,7 @@ function toggleMusic() {
     backgroundMusic.pause();
     musicButton.textContent = "🎵";
   }
+  userChangedMusic = true;
 }
 
 function setupEventListeners() {
@@ -115,6 +121,10 @@ function newGame() {
   newGameBtn.toggleAttribute("hidden");
   deck.newGame();
   initializeGame();
+  if (!userChangedMusic) {
+    backgroundMusic.play();
+    musicButton.textContent = "🔇";
+  }
 }
 
 function placeWager() {
