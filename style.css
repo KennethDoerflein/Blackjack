@@ -64,6 +64,13 @@
   height: fit-content;
 }
 
+#musicButton {
+  font-size: 10px;
+  padding: 0px;
+  height: 20px;
+  width: 20px;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(-100%);

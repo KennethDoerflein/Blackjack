@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blackjack</title>
+    <link rel="icon" type="image/x-icon" href="./cards-1.3/red_joker.png" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -13,7 +14,12 @@
   </head>
   <body>
     <div id="main" class="container my-2">
-      <div id="winner" class="container mb-4 text-center"></div>
+      <audio id="backgroundMusic" loop class="container text-center">
+        <source src="./casino-funky-background-upbeat-and-uplifting-music-intro-theme-120445.mp3" type="audio/mpeg" />
+      </audio>
+      <button id="musicButton" class="position-absolute top-0 end-0 btn-sm btn btn-warning me-3 mt-3">🎵</button>
+
+      <div id="winner" class="container mb-4 text-center position-relative"></div>
       <h4 class="container text-center">Dealer's Cards</h4>
       <div id="dealersCards" class="container"></div>
       <h4 class="container text-center">Your Cards</h4>
