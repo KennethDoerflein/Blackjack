@@ -11,7 +11,7 @@ const wagerInput = document.getElementById("wagerInput");
 const wagerBtn = document.getElementById("wagerBtn");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
-const musicButton = document.getElementById("musicButton");
+const musicSwitch = document.getElementById("musicSwitch");
 
 // Game Variables
 const deck = new CardDeck();
@@ -21,7 +21,6 @@ const animationDelay = slideDelay + flipDelay;
 let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus;
 let playerPoints = 100;
 let currentWager = 0;
-let userChangedMusic = false;
 
 // Start the game
 window.onload = () => {
@@ -89,18 +88,15 @@ function removeEventListeners() {
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
-  musicButton.removeEventListener("click", toggleMusic);
+  musicSwitch.removeEventListener("click", toggleMusic);
 }
 
 function toggleMusic() {
-  if (backgroundMusic.paused) {
+  if (musicSwitch.checked) {
     backgroundMusic.play();
-    musicButton.textContent = "🔇";
   } else {
     backgroundMusic.pause();
-    musicButton.textContent = "🎵";
   }
-  userChangedMusic = true;
 }
 
 function setupEventListeners() {
@@ -108,7 +104,7 @@ function setupEventListeners() {
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
-  musicButton.addEventListener("click", toggleMusic);
+  musicSwitch.addEventListener("click", toggleMusic);
 }
 
 function clearDiv(div) {
@@ -121,10 +117,7 @@ function newGame() {
   newGameBtn.toggleAttribute("hidden");
   deck.newGame();
   initializeGame();
-  if (!userChangedMusic) {
-    backgroundMusic.play();
-    musicButton.textContent = "🔇";
-  }
+  toggleMusic();
 }
 
 function placeWager() {
