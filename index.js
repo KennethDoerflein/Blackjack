@@ -29,8 +29,6 @@ window.onload = () => {
   setTimeout(() => initializeGame(), animationDelay * 1.5);
 };
 
-setupEventListeners();
-
 function initializeGame() {
   if (playerPoints !== 0) {
     resetGameVariables();
