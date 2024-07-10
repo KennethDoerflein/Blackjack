@@ -25,7 +25,7 @@ let currentWager = 0;
 
 // Start the game
 window.onload = () => {
-  let message = document.createElement("h4");
+  let message = document.createElement("h5");
   message.textContent = "Game is loading!";
   winnerDiv.appendChild(message);
 
@@ -69,7 +69,7 @@ function initialDeal() {
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
     toggleWagerElements();
-    let message = document.createElement("h4");
+    let message = document.createElement("h5");
     message.textContent = "Your Turn!";
     winnerDiv.appendChild(message);
   }, animationDelay * 3.6);
@@ -233,7 +233,7 @@ async function playDealer() {
 function endGame(type) {
   if (gameStatus === "inProgress") {
     winnerDiv.removeChild(winnerDiv.firstChild);
-    let message = document.createElement("h4");
+    let message = document.createElement("h5");
     message.textContent = "Dealer's Turn!";
     winnerDiv.appendChild(message);
 
@@ -261,7 +261,7 @@ function endGame(type) {
 }
 
 function displayWinner() {
-  let winner = document.createElement("h4");
+  let winner = document.createElement("h5");
   let finalHandValues = document.createElement("p");
 
   if (playerTotal > 21) {

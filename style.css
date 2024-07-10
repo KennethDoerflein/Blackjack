@@ -6,7 +6,7 @@
 }
 
 #hitBtn {
-  padding: 6px 22px 6px 22px;
+  padding: 4px 16.5px 4px 16.5px;
   font-weight: bold;
 }
 
@@ -21,14 +21,14 @@
   margin-bottom: 15px;
   padding-left: calc(5.6vh);
   border-radius: 5px;
-  max-height: 20vh !important;
-  min-height: 20vh !important;
-  height: 20vh !important;
+  max-height: 18vh !important;
+  min-height: 18vh !important;
+  height: 18vh !important;
   max-width: 50rem;
   background-color: rgb(9, 59, 9);
 }
 
-#winner h4 {
+#winner h5 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
 }
@@ -44,15 +44,16 @@
 
 #pointsDisplay,
 #wagerDisplay {
-  max-height: 4.6vh !important;
-  height: 4.6vh !important;
-  font-size: 1.6vh;
+  max-height: 3.7vh !important;
+  height: 3.7vh !important;
+  font-size: 1.2vh;
   font-weight: bold;
 }
 
 #wagerDiv .form-control,
 #wagerBtn {
-  max-width: 120px;
+  font-size: 1.2vh;
+  max-width: 80px;
 }
 
 #disclaimer p {
