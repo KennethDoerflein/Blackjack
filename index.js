@@ -12,6 +12,7 @@ const wagerBtn = document.getElementById("wagerBtn");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
+const standSwitch = document.getElementById("standSwitch");
 
 // Game Variables
 const deck = new CardDeck();
@@ -134,7 +135,7 @@ function placeWager() {
     playerPoints -= currentWager;
     wagerInput.value = "";
     updatePoints();
-
+    checkStatus("stand");
     toggleGameButtons();
     toggleWagerElements();
   } else {
@@ -216,10 +217,13 @@ function calculateTotal(cards) {
 function checkStatus(type) {
   if (playerTotal > 21 || dealerTotal > 21) {
     endGame(type);
+  } else if (playerTotal === 21 && standSwitch.checked && currentWager !== 0) {
+    endGame(type);
   }
 }
 
 async function playDealer() {
+  dealerTotal = await calculateTotal(dealersCards);
   while (dealerTotal < 17) {
     hit("dealer");
     await new Promise((resolve) => setTimeout(resolve, animationDelay));
@@ -283,7 +287,7 @@ function displayWinner() {
   currentWager = 0;
   updatePoints();
   if (playerPoints === 0) {
-    let message = document.createElement("h4");
+    let message = document.createElement("h5");
     message.textContent = "You are out of points, thank you for playing!";
     message.classList.add("mb-5");
     bottomDiv.appendChild(message);
