@@ -1,8 +1,8 @@
 #dealersCards img,
 #playersCards img {
   max-height: 100% !important;
-  margin-right: calc(-4.5vh);
-  margin-left: calc(-4.5vh);
+  margin-right: calc(-4vh);
+  margin-left: calc(-4vh);
 }
 
 #hitBtn {
