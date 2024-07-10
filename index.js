@@ -43,6 +43,7 @@ function initializeGame() {
     removeEventListeners();
     setupEventListeners();
     updatePoints();
+    newGameBtn.textContent = "New Game";
   }
 }
 
