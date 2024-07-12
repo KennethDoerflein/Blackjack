@@ -10,6 +10,7 @@ const wagerDisplay = document.getElementById("wagerDisplay");
 const wagerDiv = document.getElementById("wagerDiv");
 const wagerRst = document.getElementById("wagerRst");
 const wagerBtn = document.getElementById("wagerBtn");
+const chips = document.getElementsByClassName("chip");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
@@ -86,40 +87,34 @@ function toggleWagerElements() {
 }
 
 function removeEventListeners() {
-  let chips = document.getElementsByClassName("chip");
-
   hitBtn.removeEventListener("click", hit);
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
   wagerRst.removeEventListener("click", clearWager);
   musicSwitch.removeEventListener("click", toggleMusic);
-
-  for (let i = 0; i < chips.length; i++) {
-    chips[i].removeEventListener("click", addChipValue);
-  }
-}
-
-function toggleMusic() {
-  if (musicSwitch.checked) {
-    backgroundMusic.play();
-  } else {
-    backgroundMusic.pause();
-  }
+  removeChipEventListeners();
 }
 
 function setupEventListeners() {
-  let chips = document.getElementsByClassName("chip");
-
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
   wagerRst.addEventListener("click", clearWager);
   musicSwitch.addEventListener("click", toggleMusic);
+  setupChipEventListeners();
+}
 
+function setupChipEventListeners() {
   for (let i = 0; i < chips.length; i++) {
     chips[i].addEventListener("click", addChipValue);
+  }
+}
+
+function removeChipEventListeners() {
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].removeEventListener("click", addChipValue);
   }
 }
 
@@ -137,6 +132,9 @@ function newGame() {
 }
 
 function addChipValue(event) {
+  removeChipEventListeners();
+  wagerDisplay.classList.add("highlight");
+  this.classList.add("chipFlip");
   let chipValue = parseInt(event.target.dataset.value);
   let newWager = currentWager + chipValue;
   if (newWager <= playerPoints && Number.isInteger(newWager)) {
@@ -146,6 +144,11 @@ function addChipValue(event) {
     currentWager = playerPoints;
   }
   updatePoints();
+  setTimeout(() => {
+    this.classList.remove("chipFlip");
+    setupChipEventListeners();
+    wagerDisplay.classList.remove("highlight");
+  }, flipDelay);
 }
 
 function clearWager() {
@@ -318,5 +321,13 @@ function displayWinner() {
     bottomDiv.appendChild(message);
   } else {
     newGameBtn.toggleAttribute("hidden");
+  }
+}
+
+function toggleMusic() {
+  if (musicSwitch.checked) {
+    backgroundMusic.play();
+  } else {
+    backgroundMusic.pause();
   }
 }

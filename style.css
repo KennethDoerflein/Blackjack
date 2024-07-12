@@ -117,10 +117,50 @@
   -webkit-animation: flip 0.7s ease-in-out;
   animation: flip 0.7s ease-in-out;
   transform-style: flat;
+  will-change: transform;
 }
 
 .imgSlide {
   -webkit-animation: slideIn 0.3s ease-in-out;
   animation: slideIn 0.3s ease-in-out;
   transform-style: flat;
+  will-change: transform;
+}
+
+@keyframes flipFull {
+  from {
+    transform: rotateY(360deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+@-webkit-keyframes flipFull {
+  from {
+    transform: rotateY(360deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+.chipFlip {
+  -webkit-animation: flipFull 0.7s ease-in-out;
+  animation: flipFull 0.7s ease-in-out;
+  transform-style: flat;
+  will-change: transform;
+}
+
+@keyframes highlight {
+  0% {
+    background-color: #ccc;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: highlight 0.5s ease-in-out;
 }
