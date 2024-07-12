@@ -51,9 +51,13 @@
 }
 
 #wagerDiv img {
+  box-sizing: border-box;
+  border: 0.5vh solid #ccc;
+  border-radius: 4vh;
   max-height: 8vh;
-  padding: 5px;
+  margin: 0.5vh;
 }
+
 #wagerDiv img:hover {
   cursor: pointer;
 }
