@@ -69,6 +69,10 @@
   font-size: 12px;
 }
 
+#wagerDiv #allInBtn {
+  padding: 4px 11px 4px 11px;
+}
+
 #disclaimer p {
   font-size: 0.5rem;
 }
