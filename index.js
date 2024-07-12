@@ -7,7 +7,8 @@ const dealersDiv = document.getElementById("dealersCards");
 const winnerDiv = document.getElementById("winner");
 const pointsDisplay = document.getElementById("pointsDisplay");
 const wagerDisplay = document.getElementById("wagerDisplay");
-const wagerInput = document.getElementById("wagerInput");
+const wagerDiv = document.getElementById("wagerDiv");
+const wagerRst = document.getElementById("wagerRst");
 const wagerBtn = document.getElementById("wagerBtn");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
@@ -81,16 +82,22 @@ function toggleGameButtons() {
 }
 
 function toggleWagerElements() {
-  wagerInput.toggleAttribute("hidden");
-  wagerBtn.toggleAttribute("hidden");
+  wagerDiv.toggleAttribute("hidden");
 }
 
 function removeEventListeners() {
+  let chips = document.getElementsByClassName("chip");
+
   hitBtn.removeEventListener("click", hit);
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
+  wagerRst.removeEventListener("click", clearWager);
   musicSwitch.removeEventListener("click", toggleMusic);
+
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].removeEventListener("click", addChipValue);
+  }
 }
 
 function toggleMusic() {
@@ -102,11 +109,18 @@ function toggleMusic() {
 }
 
 function setupEventListeners() {
+  let chips = document.getElementsByClassName("chip");
+
   hitBtn.addEventListener("click", hit);
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
+  wagerRst.addEventListener("click", clearWager);
   musicSwitch.addEventListener("click", toggleMusic);
+
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].addEventListener("click", addChipValue);
+  }
 }
 
 function clearDiv(div) {
@@ -122,24 +136,32 @@ function newGame() {
   toggleMusic();
 }
 
+function addChipValue(event) {
+  let chipValue = parseInt(event.target.dataset.value);
+  let newWager = currentWager + chipValue;
+  if (newWager <= playerPoints && Number.isInteger(newWager)) {
+    currentWager = newWager;
+  } else if (newWager > playerPoints) {
+    alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
+    currentWager = playerPoints;
+  }
+  updatePoints();
+}
+
+function clearWager() {
+  currentWager = 0;
+  updatePoints();
+}
+
 function placeWager() {
-  currentWager = parseInt(wagerInput.value);
-
-  if (!isNaN(currentWager) && currentWager > 0) {
-    if (currentWager > playerPoints) {
-      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
-      wagerInput.value = playerPoints;
-      return;
-    }
-
+  if (!isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints) {
     playerPoints -= currentWager;
-    wagerInput.value = "";
     updatePoints();
     checkStatus("stand");
     toggleGameButtons();
     toggleWagerElements();
   } else {
-    alert("Please enter a valid point value to wager. It must be a positive number.");
+    alert("There was a problem, please refresh the page.");
   }
 }
 
@@ -291,6 +313,7 @@ function displayWinner() {
   if (playerPoints === 0) {
     let message = document.createElement("h5");
     message.textContent = "You are out of points, thank you for playing!";
+    message.classList.add("mt-2");
     message.classList.add("mb-5");
     bottomDiv.appendChild(message);
   } else {
