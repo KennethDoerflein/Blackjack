@@ -30,9 +30,15 @@
       </div>
 
       <div id="bottomDiv" class="container text-center">
-        <div id="wagerDiv" class="d-inline-flex mt-2">
-          <input hidden type="number" id="wagerInput" class="text-center align-middle form-control" placeholder="Ex: 5" min="1" />
-          <button hidden id="wagerBtn" class="btn-sm btn btn-primary align-middle ms-2">Place Wager</button>
+        <div hidden id="wagerDiv" class="mt-2">
+          <img class="chip" src="1Chip.jpg" data-value="1" />
+          <img class="chip" src="5Chip.jpg" data-value="5" />
+          <img class="chip" src="10Chip.jpg" data-value="10" />
+          <img class="chip" src="20Chip.jpg" data-value="20" />
+          <div>
+            <button id="wagerRst" class="btn-sm btn btn-danger align-middle ms-2 my-3">Reset Wager</button>
+            <button id="wagerBtn" class="btn-sm btn btn-primary align-middle ms-2 my-3">Place Wager</button>
+          </div>
         </div>
 
         <button hidden id="hitBtn" type="button" class="btn-sm btn btn-warning mt-2 me-5">Hit</button>
