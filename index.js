@@ -156,7 +156,6 @@ async function hit(player = "player") {
     await addCard(dealersCards, dealersDiv, player);
     dealerTotal = await calculateTotal(dealersCards);
   }
-  await new Promise((resolve) => setTimeout(resolve, 100));
   checkStatus("hit");
 }
 
@@ -218,12 +217,13 @@ function checkStatus(type) {
   if (playerTotal > 21 || dealerTotal > 21) {
     endGame(type);
   } else if (playerTotal === 21 && standSwitch.checked && currentWager !== 0) {
-    endGame(type);
+    if (playersCards.length >= 2 && dealersCards.length >= 2) {
+      endGame(type);
+    }
   }
 }
 
 async function playDealer() {
-  dealerTotal = await calculateTotal(dealersCards);
   while (dealerTotal < 17) {
     hit("dealer");
     await new Promise((resolve) => setTimeout(resolve, animationDelay));
@@ -253,6 +253,8 @@ function endGame(type) {
     }
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
+      playerTotal = await calculateTotal(playersCards);
+      dealerTotal = await calculateTotal(dealersCards);
       await playDealer();
       winnerDiv.removeChild(message);
       displayWinner();
