@@ -52,9 +52,9 @@
 
 #wagerDiv img {
   box-sizing: border-box;
-  border: 0.5vh solid #ccc;
-  border-radius: 4vh;
-  max-height: 8vh;
+  border: 0.4vh solid #ccc;
+  border-radius: 3vh;
+  max-height: 6vh;
   margin: 0.5vh;
 }
 
