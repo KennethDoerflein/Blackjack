@@ -10,6 +10,7 @@ const wagerDisplay = document.getElementById("wagerDisplay");
 const wagerDiv = document.getElementById("wagerDiv");
 const wagerRst = document.getElementById("wagerRst");
 const wagerBtn = document.getElementById("wagerBtn");
+const allInBtn = document.getElementById("allInBtn");
 const chips = document.getElementsByClassName("chip");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
@@ -91,6 +92,7 @@ function removeEventListeners() {
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
+  allInBtn.removeEventListener("click", placeWager);
   wagerRst.removeEventListener("click", clearWager);
   musicSwitch.removeEventListener("click", toggleMusic);
   removeChipEventListeners();
@@ -101,6 +103,7 @@ function setupEventListeners() {
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
+  allInBtn.addEventListener("click", placeWager);
   wagerRst.addEventListener("click", clearWager);
   musicSwitch.addEventListener("click", toggleMusic);
   setupChipEventListeners();
@@ -156,9 +159,18 @@ function clearWager() {
   updatePoints();
 }
 
-function placeWager() {
-  if (!isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints) {
-    playerPoints -= currentWager;
+function placeWager(event) {
+  var id = event.target.id;
+  var isWagerValid = !isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints;
+  var isAllIn = id === "allInBtn";
+
+  if (isWagerValid || isAllIn) {
+    if (isAllIn) {
+      currentWager = playerPoints;
+      playerPoints = 0;
+    } else {
+      playerPoints -= currentWager;
+    }
     updatePoints();
     checkStatus("stand");
     toggleGameButtons();
