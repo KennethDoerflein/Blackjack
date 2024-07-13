@@ -33,7 +33,7 @@ class CardDeck {
   }
 
   preloadImages() {
-    let images = this.cards.map((card) => `./cards-1.3/${card.image}`);
+    let images = this.cards.map((card) => `./assets/cards-1.3/${card.image}`);
 
     images.forEach((src) => {
       const img = new Image();

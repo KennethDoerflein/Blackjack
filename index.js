@@ -200,7 +200,7 @@ function addCard(cards, div, player) {
   const card = deck.getCard();
   cards.push(card);
 
-  let imgPath = "./cards-1.3/back.png";
+  let imgPath = "./assets/cards-1.3/back.png";
   let img = document.createElement("img");
   img.src = imgPath;
   img.classList.add("img-fluid");
@@ -210,7 +210,7 @@ function addCard(cards, div, player) {
       div.appendChild(img);
       img.classList.add("imgSlide");
       if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
-        let finalImgPath = `./cards-1.3/${card.image}`;
+        let finalImgPath = `./assets/cards-1.3/${card.image}`;
         setTimeout(() => {
           img.classList.remove("imgSlide");
           img.src = finalImgPath;
@@ -282,7 +282,7 @@ function endGame(type) {
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     dealerSecondCardImg.classList.remove("imgSlide");
-    let imgPath = `./cards-1.3/${dealersCards[1].image}`;
+    let imgPath = `./assets/cards-1.3/${dealersCards[1].image}`;
     if (type !== "hit") {
       flipCard(dealerSecondCardImg, imgPath);
     } else {
