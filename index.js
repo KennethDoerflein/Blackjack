@@ -176,7 +176,7 @@ function placeWager(event) {
     toggleGameButtons();
     toggleWagerElements();
   } else {
-    alert("There was a problem, please refresh the page.");
+    alert("The wager must be greater than or equal to 0.");
   }
 }
 
