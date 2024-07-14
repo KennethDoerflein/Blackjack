@@ -122,14 +122,12 @@
   -webkit-animation: flip 0.7s ease-in-out;
   animation: flip 0.7s ease-in-out;
   transform-style: flat;
-  will-change: transform;
 }
 
 .imgSlide {
   -webkit-animation: slideIn 0.3s ease-in-out;
   animation: slideIn 0.3s ease-in-out;
   transform-style: flat;
-  will-change: transform;
 }
 
 @keyframes flipFull {
@@ -154,7 +152,6 @@
   -webkit-animation: flipFull 0.7s ease-in-out;
   animation: flipFull 0.7s ease-in-out;
   transform-style: flat;
-  will-change: transform;
 }
 
 @keyframes highlight {
