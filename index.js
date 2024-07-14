@@ -7,6 +7,8 @@ const playersDiv = document.getElementById("playersHand");
 const playersDiv2 = document.getElementById("playersSecondHand");
 const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
+const dealerHeader = document.getElementById("dealerHeader");
+const playerHeader = document.getElementById("playerHeader");
 const pointsDisplay = document.getElementById("pointsDisplay");
 const wagerDisplay = document.getElementById("wagerDisplay");
 const wagerDiv = document.getElementById("wagerDiv");
@@ -24,7 +26,7 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, CurrentPlayerHand;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand;
 let playerPoints = 100;
 let currentWager = 0;
 
@@ -43,7 +45,7 @@ window.onload = () => {
 
 function initializeGame() {
   if (playerPoints !== 0) {
-    if (CurrentPlayerHand === 1 && split === true) {
+    if (currentPlayerHand === 1 && split === true) {
       playersDiv2.toggleAttribute("hidden");
     }
 
@@ -65,9 +67,11 @@ function resetGameVariables() {
   playersHand = [[], []];
   dealerTotal = 0;
   playerTotal = [0, 0];
-  CurrentPlayerHand = 0;
+  currentPlayerHand = 0;
   gameStatus = "inProgress";
   split = false;
+  playerHeader.innerText = `Players's Cards`;
+  dealerHeader.innerText = `Dealers's Cards`;
 }
 
 function clearGameBoard() {
@@ -88,7 +92,7 @@ function initialDeal() {
     message.textContent = "Your Turn!";
     messageDiv.appendChild(message);
 
-    if (playersHand[CurrentPlayerHand].length === 2 && playersHand[CurrentPlayerHand][0].rank === playersHand[CurrentPlayerHand][1].rank && currentWager > 0) {
+    if (playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank && currentWager > 0) {
       if (currentWager * 2 <= playerPoints) {
         splitBtn.toggleAttribute("hidden");
       }
@@ -214,17 +218,22 @@ async function hit(player = "player") {
 
   if (player !== "dealer") {
     let currentWagerPlayerDiv;
-    if (CurrentPlayerHand === 0) {
+    if (currentPlayerHand === 0) {
       currentWagerPlayerDiv = playersDiv;
-    } else if (CurrentPlayerHand === 1) {
+    } else if (currentPlayerHand === 1) {
       currentWagerPlayerDiv = playersDiv2;
     }
-    await addCard(playersHand[CurrentPlayerHand], currentWagerPlayerDiv, player);
+    await addCard(playersHand[currentPlayerHand], currentWagerPlayerDiv, player);
   } else {
     await addCard(dealersHand, dealersDiv, player);
   }
 
-  playerTotal[CurrentPlayerHand] = await calculateTotal(playersHand[CurrentPlayerHand]);
+  playerTotal[currentPlayerHand] = await calculateTotal(playersHand[currentPlayerHand]);
+  if (playersDiv2.hasAttribute("hidden")) {
+    playerHeader.innerText = `Players's Cards (Total: ${playerTotal[0]})`;
+  } else {
+    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
+  }
   dealerTotal = await calculateTotal(dealersHand);
 
   checkStatus("hit");
@@ -288,10 +297,10 @@ function calculateTotal(cards) {
 }
 
 function checkStatus(type) {
-  if (playerTotal[CurrentPlayerHand] > 21 || dealerTotal > 21) {
+  if (playerTotal[currentPlayerHand] > 21 || dealerTotal > 21) {
     endGame(type);
-  } else if (playerTotal[CurrentPlayerHand] === 21 && standSwitch.checked && currentWager !== 0) {
-    if (playersHand[CurrentPlayerHand].length >= 2 && dealersHand.length >= 2) {
+  } else if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked && currentWager !== 0) {
+    if (playersHand[currentPlayerHand].length >= 2 && dealersHand.length >= 2) {
       endGame(type);
     }
   }
@@ -303,6 +312,10 @@ function splitHand() {
     split = true;
 
     playersHand[1].push(playersHand[0].pop());
+
+    playerTotal[0] = playersHand[0][0].pointValue;
+    playerTotal[1] = playersHand[1][0].pointValue;
+    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
 
     clearDiv(playersDiv);
     playersDiv2.toggleAttribute("hidden");
@@ -322,14 +335,14 @@ function splitHand() {
     setTimeout(() => hit(), animationDelay * 0.8);
 
     setTimeout(() => {
-      CurrentPlayerHand = 1;
+      currentPlayerHand = 1;
       hit();
     }, animationDelay * 2);
 
     setTimeout(() => {
-      CurrentPlayerHand = 0;
+      currentPlayerHand = 0;
       playerTotal[1] = calculateTotal(playersHand[1]);
-      playerTotal[CurrentPlayerHand] = calculateTotal(playersHand[CurrentPlayerHand]);
+      playerTotal[currentPlayerHand] = calculateTotal(playersHand[currentPlayerHand]);
       playerPoints -= currentWager;
       currentWager *= 2;
       updatePoints();
@@ -349,7 +362,7 @@ async function playDealer() {
 }
 
 function endGame(type) {
-  if (gameStatus === "inProgress" && (CurrentPlayerHand === 1 || split === false)) {
+  if (gameStatus === "inProgress" && (currentPlayerHand === 1 || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
@@ -365,7 +378,7 @@ function endGame(type) {
       splitBtn.toggleAttribute("hidden");
     }
 
-    if (CurrentPlayerHand === 1 && split === true) {
+    if (currentPlayerHand === 1 && split === true) {
       playersDiv2.classList.remove("activeHand");
     }
 
@@ -388,8 +401,8 @@ function endGame(type) {
       messageDiv.removeChild(message);
       displayWinner();
     }, modifiedDelay);
-  } else if (CurrentPlayerHand === 0 && split === true) {
-    CurrentPlayerHand = 1;
+  } else if (currentPlayerHand === 0 && split === true) {
+    currentPlayerHand = 1;
     playersDiv2.classList.add("activeHand");
     playersDiv.classList.remove("activeHand");
   }
@@ -399,6 +412,8 @@ function displayWinner() {
   let winner = document.createElement("h6");
   let winner2;
   let finalHandValues = document.createElement("p");
+
+  dealerHeader.innerText = `Dealers's Cards (Total: ${dealerTotal})`;
 
   let outcomes = [[], []];
 
@@ -422,7 +437,11 @@ function displayWinner() {
     }
 
     playerPoints += currentWager * wagerMultiplier;
-    outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome} (Player: ${playerTotal[handIndex]}, Dealer: ${dealerTotal})`;
+    if (currentPlayerHand === 1) {
+      outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
+    } else {
+      outcomes[handIndex] = `${outcome}`;
+    }
 
     winner.textContent = outcomes[0];
     messageDiv.append(winner);
