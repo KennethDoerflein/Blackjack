@@ -1,6 +1,6 @@
-#dealersCards img,
-#playersCards img,
-#playersCards2 img {
+#dealersHand img,
+#playersHand img,
+#playersSecondHand img {
   max-height: 100% !important;
   margin-right: calc(-4vh);
   margin-left: calc(-4vh);
@@ -20,9 +20,9 @@
   font-weight: bold;
 }
 
-#dealersCards,
-#playersCards,
-#playersCards2 {
+#dealersHand,
+#playersHand,
+#playersSecondHand {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 15px;
@@ -35,13 +35,13 @@
   background-color: rgb(9, 59, 9);
 }
 
-#message h5 {
+#message h6 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
 }
 
 #message {
-  height: 40px !important;
+  min-height: 40px !important;
 }
 
 #main {
@@ -90,8 +90,8 @@
 }
 
 .activeHand {
-  border: 2px solid yellow;
-  box-shadow: 0 0 10px yellow;
+  border: 5px solid yellow;
+  box-shadow: 0 0 15px yellow;
 }
 
 @keyframes slideIn {

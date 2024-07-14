@@ -3,9 +3,9 @@ const hitBtn = document.getElementById("hitBtn");
 const splitBtn = document.getElementById("splitBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
-const playersDiv = document.getElementById("playersCards");
-const playersDiv2 = document.getElementById("playersCards2");
-const dealersDiv = document.getElementById("dealersCards");
+const playersDiv = document.getElementById("playersHand");
+const playersDiv2 = document.getElementById("playersSecondHand");
+const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
 const pointsDisplay = document.getElementById("pointsDisplay");
 const wagerDisplay = document.getElementById("wagerDisplay");
@@ -24,13 +24,13 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersCards, dealerTotal, playersCards, playerTotal, gameStatus, split, playerHand;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, CurrentPlayerHand;
 let playerPoints = 100;
 let currentWager = 0;
 
 // Start the game
 window.onload = () => {
-  let message = document.createElement("h5");
+  let message = document.createElement("h6");
   message.textContent = "Game is loading!";
   messageDiv.appendChild(message);
 
@@ -43,7 +43,7 @@ window.onload = () => {
 
 function initializeGame() {
   if (playerPoints !== 0) {
-    if (playerHand === 1 && split === true) {
+    if (CurrentPlayerHand === 1 && split === true) {
       playersDiv2.toggleAttribute("hidden");
     }
 
@@ -54,18 +54,18 @@ function initializeGame() {
     updatePoints();
     toggleWagerElements();
     newGameBtn.textContent = "New Game";
-    let message = document.createElement("h5");
+    let message = document.createElement("h6");
     message.textContent = "Place your wager to begin!";
     messageDiv.appendChild(message);
   }
 }
 
 function resetGameVariables() {
-  dealersCards = [];
-  playersCards = [[], []];
+  dealersHand = [];
+  playersHand = [[], []];
   dealerTotal = 0;
   playerTotal = [0, 0];
-  playerHand = 0;
+  CurrentPlayerHand = 0;
   gameStatus = "inProgress";
   split = false;
 }
@@ -84,11 +84,11 @@ function initialDeal() {
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
     toggleGameButtons();
-    let message = document.createElement("h5");
+    let message = document.createElement("h6");
     message.textContent = "Your Turn!";
     messageDiv.appendChild(message);
 
-    if (playersCards[playerHand].length === 2 && playersCards[playerHand][0].rank === playersCards[playerHand][1].rank && currentWager > 0) {
+    if (playersHand[CurrentPlayerHand].length === 2 && playersHand[CurrentPlayerHand][0].rank === playersHand[CurrentPlayerHand][1].rank && currentWager > 0) {
       if (currentWager * 2 <= playerPoints) {
         splitBtn.toggleAttribute("hidden");
       }
@@ -214,18 +214,18 @@ async function hit(player = "player") {
 
   if (player !== "dealer") {
     let currentWagerPlayerDiv;
-    if (playerHand === 0) {
+    if (CurrentPlayerHand === 0) {
       currentWagerPlayerDiv = playersDiv;
-    } else if (playerHand === 1) {
+    } else if (CurrentPlayerHand === 1) {
       currentWagerPlayerDiv = playersDiv2;
     }
-    await addCard(playersCards[playerHand], currentWagerPlayerDiv, player);
+    await addCard(playersHand[CurrentPlayerHand], currentWagerPlayerDiv, player);
   } else {
-    await addCard(dealersCards, dealersDiv, player);
+    await addCard(dealersHand, dealersDiv, player);
   }
 
-  playerTotal[playerHand] = await calculateTotal(playersCards[playerHand]);
-  dealerTotal = await calculateTotal(dealersCards);
+  playerTotal[CurrentPlayerHand] = await calculateTotal(playersHand[CurrentPlayerHand]);
+  dealerTotal = await calculateTotal(dealersHand);
 
   checkStatus("hit");
   setTimeout(() => {
@@ -288,28 +288,27 @@ function calculateTotal(cards) {
 }
 
 function checkStatus(type) {
-  if (playerTotal[playerHand] > 21 || dealerTotal > 21) {
+  if (playerTotal[CurrentPlayerHand] > 21 || dealerTotal > 21) {
     endGame(type);
-  } else if (playerTotal[playerHand] === 21 && standSwitch.checked && currentWager !== 0) {
-    if (playersCards[playerHand].length >= 2 && dealersCards.length >= 2) {
+  } else if (playerTotal[CurrentPlayerHand] === 21 && standSwitch.checked && currentWager !== 0) {
+    if (playersHand[CurrentPlayerHand].length >= 2 && dealersHand.length >= 2) {
       endGame(type);
     }
   }
 }
 
 function splitHand() {
-  if (playersCards[0].length === 2 && playersCards[0][0].rank === playersCards[0][1].rank) {
+  if (playersHand[0].length === 2 && playersHand[0][0].rank === playersHand[0][1].rank) {
     toggleGameButtons();
-    splitBtn.toggleAttribute("hidden");
     split = true;
 
-    playersCards[1].push(playersCards[0].pop());
+    playersHand[1].push(playersHand[0].pop());
 
     clearDiv(playersDiv);
     playersDiv2.toggleAttribute("hidden");
 
     for (let i = 0; i < 2; i++) {
-      let imgPath = `./assets/cards-1.3/${playersCards[i][0].image}`;
+      let imgPath = `./assets/cards-1.3/${playersHand[i][0].image}`;
       let img = document.createElement("img");
       img.src = imgPath;
       img.classList.add("img-fluid", "imgSlide");
@@ -323,14 +322,14 @@ function splitHand() {
     setTimeout(() => hit(), animationDelay * 0.8);
 
     setTimeout(() => {
-      playerHand = 1;
+      CurrentPlayerHand = 1;
       hit();
     }, animationDelay * 2);
 
     setTimeout(() => {
-      playerHand = 0;
-      playerTotal[1] = calculateTotal(playersCards[1]);
-      playerTotal[playerHand] = calculateTotal(playersCards[playerHand]);
+      CurrentPlayerHand = 0;
+      playerTotal[1] = calculateTotal(playersHand[1]);
+      playerTotal[CurrentPlayerHand] = calculateTotal(playersHand[CurrentPlayerHand]);
       playerPoints -= currentWager;
       currentWager *= 2;
       updatePoints();
@@ -343,16 +342,16 @@ function splitHand() {
 async function playDealer() {
   while (dealerTotal < 17) {
     await hit("dealer");
-    dealerTotal = await calculateTotal(dealersCards);
+    dealerTotal = await calculateTotal(dealersHand);
     await new Promise((resolve) => setTimeout(resolve, animationDelay));
   }
   endGame("dealer");
 }
 
 function endGame(type) {
-  if (gameStatus === "inProgress" && (playerHand === 1 || split === false)) {
+  if (gameStatus === "inProgress" && (CurrentPlayerHand === 1 || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
-    let message = document.createElement("h5");
+    let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
     messageDiv.appendChild(message);
 
@@ -366,13 +365,13 @@ function endGame(type) {
       splitBtn.toggleAttribute("hidden");
     }
 
-    if (playerHand === 1 && split === true) {
+    if (CurrentPlayerHand === 1 && split === true) {
       playersDiv2.classList.remove("activeHand");
     }
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     dealerSecondCardImg.classList.remove("imgSlide");
-    let imgPath = `./assets/cards-1.3/${dealersCards[1].image}`;
+    let imgPath = `./assets/cards-1.3/${dealersHand[1].image}`;
 
     if (type !== "hit") {
       flipCard(dealerSecondCardImg, imgPath);
@@ -382,28 +381,28 @@ function endGame(type) {
 
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
-      playerTotal[0] = await calculateTotal(playersCards[0]);
-      playerTotal[1] = await calculateTotal(playersCards[1]);
-      dealerTotal = await calculateTotal(dealersCards);
+      playerTotal[0] = await calculateTotal(playersHand[0]);
+      playerTotal[1] = await calculateTotal(playersHand[1]);
+      dealerTotal = await calculateTotal(dealersHand);
       await playDealer();
       messageDiv.removeChild(message);
       displayWinner();
     }, modifiedDelay);
-  } else if (playerHand === 0 && split === true) {
-    playerHand = 1;
+  } else if (CurrentPlayerHand === 0 && split === true) {
+    CurrentPlayerHand = 1;
     playersDiv2.classList.add("activeHand");
     playersDiv.classList.remove("activeHand");
   }
 }
 
 function displayWinner() {
-  let winner = document.createElement("h5");
+  let winner = document.createElement("h6");
   let winner2;
   let finalHandValues = document.createElement("p");
 
   let outcomes = [[], []];
 
-  for (let handIndex = 0; handIndex < playersCards.length; handIndex++) {
+  for (let handIndex = 0; handIndex < playersHand.length; handIndex++) {
     let outcome = "";
     let wagerMultiplier = 0;
 
@@ -428,8 +427,8 @@ function displayWinner() {
     winner.textContent = outcomes[0];
     messageDiv.append(winner);
 
-    if (handIndex === 1 && playersCards[handIndex].length > 0) {
-      winner2 = document.createElement("h5");
+    if (handIndex === 1 && playersHand[handIndex].length > 0) {
+      winner2 = document.createElement("h6");
       winner2.textContent = outcomes[1];
       messageDiv.append(winner2);
     }
@@ -438,7 +437,7 @@ function displayWinner() {
   currentWager = 0;
   updatePoints();
   if (playerPoints === 0) {
-    let message = document.createElement("h5");
+    let message = document.createElement("h6");
     message.textContent = "You are out of points, thank you for playing!";
     message.classList.add("mt-2", "mb-5");
     bottomDiv.appendChild(message);
