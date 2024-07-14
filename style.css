@@ -1,5 +1,6 @@
 #dealersCards img,
-#playersCards img {
+#playersCards img,
+#playersCards2 img {
   max-height: 100% !important;
   margin-right: calc(-4vh);
   margin-left: calc(-4vh);
@@ -15,7 +16,8 @@
 }
 
 #dealersCards,
-#playersCards {
+#playersCards,
+#playersCards2 {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 15px;

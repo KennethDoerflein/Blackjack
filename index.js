@@ -3,6 +3,7 @@ const hitBtn = document.getElementById("hitBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
 const playersDiv = document.getElementById("playersCards");
+const playersDiv2 = document.getElementById("playersCards2");
 const dealersDiv = document.getElementById("dealersCards");
 const winnerDiv = document.getElementById("winner");
 const pointsDisplay = document.getElementById("pointsDisplay");
@@ -53,9 +54,9 @@ function initializeGame() {
 
 function resetGameVariables() {
   dealersCards = [];
-  playersCards = [];
+  playersCards = [[], []];
   dealerTotal = 0;
-  playerTotal = 0;
+  playerTotal = [0, 0];
   gameStatus = "inProgress";
 }
 
@@ -187,8 +188,8 @@ function updatePoints() {
 
 async function hit(player = "player") {
   if (player !== "dealer") {
-    await addCard(playersCards, playersDiv, player);
-    playerTotal = await calculateTotal(playersCards);
+    await addCard(playersCards[0], playersDiv, player);
+    playerTotal[0] = await calculateTotal(playersCards[0]);
   } else {
     await addCard(dealersCards, dealersDiv, player);
     dealerTotal = await calculateTotal(dealersCards);
@@ -251,11 +252,16 @@ function calculateTotal(cards) {
 }
 
 function checkStatus(type) {
-  if (playerTotal > 21 || dealerTotal > 21) {
+  if (playerTotal[0] > 21 || dealerTotal > 21) {
     endGame(type);
-  } else if (playerTotal === 21 && standSwitch.checked && currentWager !== 0) {
-    if (playersCards.length >= 2 && dealersCards.length >= 2) {
+  } else if (playerTotal[0] === 21 && standSwitch.checked && currentWager !== 0) {
+    if (playersCards[0].length >= 2 && dealersCards.length >= 2) {
       endGame(type);
+    }
+  } else if (playersCards[0].length === 2 && playersCards[0][0].rank === playersCards[0][1].rank && currentWager > 0) {
+    let canSplit = confirm("You can Split your hand! Would you like to Split?");
+    if (canSplit) {
+      //splitHand();
     }
   }
 }
@@ -290,7 +296,7 @@ function endGame(type) {
     }
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
-      playerTotal = await calculateTotal(playersCards);
+      playerTotal[0] = await calculateTotal(playersCards[0]);
       dealerTotal = await calculateTotal(dealersCards);
       await playDealer();
       winnerDiv.removeChild(message);
@@ -303,14 +309,14 @@ function displayWinner() {
   let winner = document.createElement("h5");
   let finalHandValues = document.createElement("p");
 
-  if (playerTotal > 21) {
+  if (playerTotal[0] > 21) {
     winner.textContent = "Player Busted, Dealer Wins";
   } else if (dealerTotal > 21) {
     winner.textContent = "Dealer Busted, Player Wins";
     playerPoints += currentWager * 2;
-  } else if (dealerTotal > playerTotal) {
+  } else if (dealerTotal > playerTotal[0]) {
     winner.textContent = "Dealer Wins";
-  } else if (playerTotal > dealerTotal) {
+  } else if (playerTotal[0] > dealerTotal) {
     winner.textContent = "Player Wins";
     playerPoints += currentWager * 2;
   } else {
@@ -318,7 +324,7 @@ function displayWinner() {
     playerPoints += currentWager;
   }
 
-  finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal}, Dealer - ${dealerTotal}`;
+  finalHandValues.textContent = `Final Hand Values: Player - ${playerTotal[0]}, Dealer - ${dealerTotal}`;
 
   winnerDiv.appendChild(winner);
   winnerDiv.appendChild(finalHandValues);
