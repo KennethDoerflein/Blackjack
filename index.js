@@ -89,7 +89,6 @@ function toggleWagerElements() {
 }
 
 function removeEventListeners() {
-  hitBtn.removeEventListener("click", hit);
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
@@ -187,14 +186,21 @@ function updatePoints() {
 }
 
 async function hit(player = "player") {
+  hitBtn.removeEventListener("click", hit);
+  
   if (player !== "dealer") {
     await addCard(playersCards[0], playersDiv, player);
-    playerTotal[0] = await calculateTotal(playersCards[0]);
   } else {
     await addCard(dealersCards, dealersDiv, player);
-    dealerTotal = await calculateTotal(dealersCards);
   }
+
+  playerTotal[0] = await calculateTotal(playersCards[0]);
+  dealerTotal = await calculateTotal(dealersCards);
+
   checkStatus("hit");
+  setTimeout(() => {
+    hitBtn.addEventListener("click", hit);
+  }, animationDelay);
 }
 
 function addCard(cards, div, player) {
