@@ -49,6 +49,7 @@ window.onload = () => {
   }, animationDelay * 1);
 };
 
+// Initialize the game
 function initializeGame() {
   if (playerPoints !== 0) {
     if (split === true) {
@@ -72,6 +73,7 @@ function initializeGame() {
   }
 }
 
+// Reset game variables
 function resetGameVariables() {
   dealersHand = [];
   playersHand = [[], [], [], []];
@@ -85,6 +87,7 @@ function resetGameVariables() {
   dealerHeader.innerText = `Dealer's Cards`;
 }
 
+// Clear game board
 function clearGameBoard() {
   for (let i = 0; i < playerHandElements.length; i++) {
     clearDiv(playerHandElements[i]);
@@ -93,6 +96,7 @@ function clearGameBoard() {
   clearDiv(messageDiv);
 }
 
+// Initial deal
 function initialDeal() {
   hit();
   setTimeout(() => hit("dealer"), animationDelay);
@@ -107,7 +111,7 @@ function initialDeal() {
     checkStatus("split");
   }, animationDelay * 3.6);
 }
-
+// Toggle game buttons
 function toggleGameButtons() {
   hitBtn.toggleAttribute("hidden");
   standBtn.toggleAttribute("hidden");
@@ -116,10 +120,12 @@ function toggleGameButtons() {
   }
 }
 
+// Toggle wager elements
 function toggleWagerElements() {
   wagerDiv.toggleAttribute("hidden");
 }
 
+// Remove event listeners
 function removeEventListeners() {
   hitBtn.removeEventListener("click", hit);
   splitBtn.removeEventListener("click", splitHand);
@@ -132,6 +138,7 @@ function removeEventListeners() {
   removeChipEventListeners();
 }
 
+// Setup event listeners
 function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   splitBtn.addEventListener("click", splitHand);
@@ -144,24 +151,28 @@ function setupEventListeners() {
   setupChipEventListeners();
 }
 
+// Setup chip event listeners
 function setupChipEventListeners() {
   for (let i = 0; i < chips.length; i++) {
     chips[i].addEventListener("click", addChipValue);
   }
 }
 
+// Remove chip event listeners
 function removeChipEventListeners() {
   for (let i = 0; i < chips.length; i++) {
     chips[i].removeEventListener("click", addChipValue);
   }
 }
 
+// Clear div content
 function clearDiv(div) {
   while (div.firstChild) {
     div.removeChild(div.firstChild);
   }
 }
 
+// Start a new game
 function newGame() {
   newGameBtn.toggleAttribute("hidden");
   deck.newGame();
@@ -169,6 +180,7 @@ function newGame() {
   toggleMusic();
 }
 
+// Add chip value to the wager
 function addChipValue(event) {
   removeChipEventListeners();
   wagerDisplay.classList.add("highlight");
@@ -189,11 +201,13 @@ function addChipValue(event) {
   }, flipDelay);
 }
 
+// Clear the wager
 function clearWager() {
   currentWager = 0;
   updatePoints();
 }
 
+// Place the wager
 function placeWager(event) {
   var id = event.target.id;
   var isWagerValid = !isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints;
@@ -215,11 +229,13 @@ function placeWager(event) {
   }
 }
 
+// Update points display
 function updatePoints() {
   pointsDisplay.textContent = "Points*: " + playerPoints;
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
+// Update headers with current totals
 async function updateHeaders() {
   await updateHandTotals();
 
@@ -236,6 +252,7 @@ async function updateHeaders() {
   }
 }
 
+// Deal a card to the player or dealer
 async function hit(player = "player") {
   hitBtn.removeEventListener("click", hit);
   await updateHeaders();
@@ -256,6 +273,7 @@ async function hit(player = "player") {
   }, animationDelay / 1.2);
 }
 
+// Add a card to the specified hand
 function addCard(cards, div, player) {
   const card = deck.getCard();
   cards.push(card);
@@ -286,6 +304,7 @@ function addCard(cards, div, player) {
   });
 }
 
+// Flip the card over
 function flipCard(cardImg, imgPath) {
   cardImg.classList.remove("imgSlide");
   cardImg.src = imgPath;
@@ -296,6 +315,7 @@ function flipCard(cardImg, imgPath) {
   };
 }
 
+// Calculate the total points for a hand
 function calculateTotal(cards) {
   return new Promise((resolve) => {
     let total = 0;
@@ -314,6 +334,7 @@ function calculateTotal(cards) {
   });
 }
 
+// Update the totals for the player's hands and the dealer's hand
 async function updateHandTotals() {
   for (let i = 0; i < playerTotal.length; i++) {
     playerTotal[i] = await calculateTotal(playersHand[i]);
@@ -322,6 +343,7 @@ async function updateHandTotals() {
   dealerTotal = await calculateTotal(dealersHand);
 }
 
+// Check the status of the game
 function checkStatus(type) {
   if (playerTotal[currentPlayerHand] > 21) {
     endGame(type);
@@ -346,6 +368,7 @@ function checkStatus(type) {
   }
 }
 
+// Split the player's hand
 async function splitHand() {
   if (splitCount < 3 && playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank) {
     toggleGameButtons();
@@ -401,6 +424,7 @@ async function splitHand() {
   }
 }
 
+// Play for the dealer
 async function playDealer() {
   while (dealerTotal < 17) {
     await hit("dealer");
@@ -410,6 +434,7 @@ async function playDealer() {
   endGame("dealer");
 }
 
+// End the game or move to next hand
 function endGame(type) {
   if (gameStatus === "inProgress" && (currentPlayerHand === splitCount || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
@@ -458,6 +483,7 @@ function endGame(type) {
   }
 }
 
+// Display result
 function displayWinner() {
   let winner = document.createElement("h6");
   let winner2;
@@ -530,6 +556,7 @@ function displayWinner() {
   }
 }
 
+// Toggle background music
 function toggleMusic() {
   if (musicSwitch.checked) {
     backgroundMusic.play();
