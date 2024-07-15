@@ -97,6 +97,7 @@ function initialDeal() {
         splitBtn.toggleAttribute("hidden");
       }
     }
+    checkStatus("hit");
   }, animationDelay * 3.6);
 }
 
@@ -229,6 +230,7 @@ async function updateHeaders() {
 
 async function hit(player = "player") {
   hitBtn.removeEventListener("click", hit);
+  await updateHeaders();
 
   if (player !== "dealer") {
     let currentWagerPlayerDiv;
@@ -308,9 +310,10 @@ function calculateTotal(cards) {
 }
 
 function checkStatus(type) {
-  if (playerTotal[currentPlayerHand] > 21 || dealerTotal > 21) {
+  if (playerTotal[currentPlayerHand] > 21) {
     endGame(type);
-  } else if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked && currentWager !== 0) {
+  }
+  if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
     if (playersHand[currentPlayerHand].length >= 2 && dealersHand.length >= 2) {
       endGame(type);
     }
@@ -441,12 +444,14 @@ function displayWinner() {
       wagerMultiplier = 0;
     } else if (dealerTotal > 21) {
       outcome = "Dealer Busted, Player Wins";
-      wagerMultiplier = 2;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.5;
+      else wagerMultiplier = 2;
     } else if (dealerTotal > playerTotal[handIndex]) {
       outcome = "Dealer Wins";
     } else if (playerTotal[handIndex] > dealerTotal) {
       outcome = "Player Wins";
-      wagerMultiplier = 2;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.5;
+      else wagerMultiplier = 2;
     } else {
       outcome = "Push (Tie)";
       wagerMultiplier = 1;
