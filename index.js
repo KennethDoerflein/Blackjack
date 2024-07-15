@@ -429,8 +429,11 @@ function displayWinner() {
     let outcome = "";
     let wagerMultiplier = 0;
 
+    if (playersHand[handIndex].length === 0) continue;
+
     if (playerTotal[handIndex] > 21) {
       outcome = "Player Busted, Dealer Wins";
+      wagerMultiplier = 0;
     } else if (dealerTotal > 21) {
       outcome = "Dealer Busted, Player Wins";
       wagerMultiplier = 2;
