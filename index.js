@@ -213,6 +213,17 @@ function updatePoints() {
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
+function updateHeaders() {
+  if (playersDiv2.hasAttribute("hidden")) {
+    playerHeader.innerText = `Players's Cards (Total: ${playerTotal[0]})`;
+  } else {
+    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
+  }
+  if (gameStatus !== "inProgress") {
+    dealerHeader.innerText = `Dealers's Cards (Total: ${dealerTotal})`;
+  }
+}
+
 async function hit(player = "player") {
   hitBtn.removeEventListener("click", hit);
 
@@ -228,12 +239,9 @@ async function hit(player = "player") {
     await addCard(dealersHand, dealersDiv, player);
   }
 
-  playerTotal[currentPlayerHand] = await calculateTotal(playersHand[currentPlayerHand]);
-  if (playersDiv2.hasAttribute("hidden")) {
-    playerHeader.innerText = `Players's Cards (Total: ${playerTotal[0]})`;
-  } else {
-    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
-  }
+  playerTotal[0] = await calculateTotal(playersHand[0]);
+  playerTotal[1] = await calculateTotal(playersHand[1]);
+  updateHeaders();
   dealerTotal = await calculateTotal(dealersHand);
 
   checkStatus("hit");
@@ -315,7 +323,7 @@ function splitHand() {
 
     playerTotal[0] = playersHand[0][0].pointValue;
     playerTotal[1] = playersHand[1][0].pointValue;
-    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
+    updateHeaders();
 
     clearDiv(playersDiv);
     playersDiv2.toggleAttribute("hidden");
@@ -413,7 +421,7 @@ function displayWinner() {
   let winner2;
   let finalHandValues = document.createElement("p");
 
-  dealerHeader.innerText = `Dealers's Cards (Total: ${dealerTotal})`;
+  updateHeaders();
 
   let outcomes = [[], []];
 
