@@ -70,8 +70,8 @@ function resetGameVariables() {
   currentPlayerHand = 0;
   gameStatus = "inProgress";
   split = false;
-  playerHeader.innerText = `Players's Cards`;
-  dealerHeader.innerText = `Dealers's Cards`;
+  playerHeader.innerText = `Player's Cards`;
+  dealerHeader.innerText = `Dealer's Cards`;
 }
 
 function clearGameBoard() {
@@ -87,6 +87,7 @@ function initialDeal() {
   setTimeout(() => hit(), animationDelay * 2);
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
+    checkStatus("stand");
     toggleGameButtons();
     let message = document.createElement("h6");
     message.textContent = "Your Turn!";
@@ -199,7 +200,6 @@ function placeWager(event) {
       playerPoints -= currentWager;
     }
     updatePoints();
-    checkStatus("stand");
     toggleWagerElements();
     initialDeal();
     clearDiv(messageDiv);
@@ -213,14 +213,18 @@ function updatePoints() {
   wagerDisplay.textContent = "Current Wager: " + currentWager;
 }
 
-function updateHeaders() {
+async function updateHeaders() {
+  playerTotal[0] = await calculateTotal(playersHand[0]);
+  playerTotal[1] = await calculateTotal(playersHand[1]);
+  dealerTotal = await calculateTotal(dealersHand);
+
   if (playersDiv2.hasAttribute("hidden")) {
-    playerHeader.innerText = `Players's Cards (Total: ${playerTotal[0]})`;
+    playerHeader.innerText = `Player's Cards (Total: ${playerTotal[0]})`;
   } else {
-    playerHeader.innerText = `Players's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
+    playerHeader.innerText = `Player's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
   }
   if (gameStatus !== "inProgress") {
-    dealerHeader.innerText = `Dealers's Cards (Total: ${dealerTotal})`;
+    dealerHeader.innerText = `Dealer's Cards (Total: ${dealerTotal})`;
   }
 }
 
@@ -241,7 +245,7 @@ async function hit(player = "player") {
 
   playerTotal[0] = await calculateTotal(playersHand[0]);
   playerTotal[1] = await calculateTotal(playersHand[1]);
-  updateHeaders();
+  await updateHeaders();
   dealerTotal = await calculateTotal(dealersHand);
 
   checkStatus("hit");
@@ -399,6 +403,8 @@ function endGame(type) {
     } else {
       setTimeout(() => flipCard(dealerSecondCardImg, imgPath), animationDelay);
     }
+
+    updateHeaders();
 
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
