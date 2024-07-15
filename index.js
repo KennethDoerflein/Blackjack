@@ -267,7 +267,9 @@ function addCard(cards, div, player) {
   return new Promise((resolve) => {
     img.onload = () => {
       div.appendChild(img);
-      img.classList.add("imgSlide");
+      requestAnimationFrame(() => {
+        img.classList.add("imgSlide");
+      });
       if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
         let finalImgPath = `./assets/cards-1.3/${card.image}`;
         setTimeout(() => {
@@ -287,7 +289,9 @@ function flipCard(cardImg, imgPath) {
   cardImg.classList.remove("imgSlide");
   cardImg.src = imgPath;
   cardImg.onload = () => {
-    cardImg.classList.add("imgFlip");
+    requestAnimationFrame(() => {
+      cardImg.classList.add("imgFlip");
+    });
   };
 }
 
