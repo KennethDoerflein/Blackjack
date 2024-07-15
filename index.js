@@ -87,7 +87,6 @@ function initialDeal() {
   setTimeout(() => hit(), animationDelay * 2);
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
-    checkStatus("stand");
     toggleGameButtons();
     let message = document.createElement("h6");
     message.textContent = "Your Turn!";
