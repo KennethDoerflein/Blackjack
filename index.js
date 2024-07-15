@@ -3,8 +3,6 @@ const hitBtn = document.getElementById("hitBtn");
 const splitBtn = document.getElementById("splitBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
-const playersDiv = document.getElementById("playersHand");
-const playersDiv2 = document.getElementById("playersSecondHand");
 const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
 const dealerHeader = document.getElementById("dealerHeader");
@@ -26,9 +24,17 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount;
 let playerPoints = 100;
 let currentWager = 0;
+
+// Array for player's hand elements
+const playerHandElements = [
+  document.getElementById("playersHand"),
+  document.getElementById("playersSecondHand"),
+  document.getElementById("playersThirdHand"),
+  document.getElementById("playersFourthHand"),
+];
 
 // Start the game
 window.onload = () => {
@@ -45,8 +51,12 @@ window.onload = () => {
 
 function initializeGame() {
   if (playerPoints !== 0) {
-    if (currentPlayerHand === 1 && split === true) {
-      playersDiv2.toggleAttribute("hidden");
+    if (split === true) {
+      for (let i = 1; i < playerHandElements.length; i++) {
+        if (!playerHandElements[i].hasAttribute("hidden")) {
+          playerHandElements[i].toggleAttribute("hidden");
+        }
+      }
     }
 
     resetGameVariables();
@@ -64,10 +74,11 @@ function initializeGame() {
 
 function resetGameVariables() {
   dealersHand = [];
-  playersHand = [[], []];
+  playersHand = [[], [], [], []];
   dealerTotal = 0;
-  playerTotal = [0, 0];
+  playerTotal = [0, 0, 0, 0];
   currentPlayerHand = 0;
+  splitCount = 0;
   gameStatus = "inProgress";
   split = false;
   playerHeader.innerText = `Player's Cards`;
@@ -75,8 +86,9 @@ function resetGameVariables() {
 }
 
 function clearGameBoard() {
-  clearDiv(playersDiv);
-  clearDiv(playersDiv2);
+  for (let i = 0; i < playerHandElements.length; i++) {
+    clearDiv(playerHandElements[i]);
+  }
   clearDiv(dealersDiv);
   clearDiv(messageDiv);
 }
@@ -91,13 +103,8 @@ function initialDeal() {
     let message = document.createElement("h6");
     message.textContent = "Your Turn!";
     messageDiv.appendChild(message);
-
-    if (playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank && currentWager > 0) {
-      if (currentWager * 2 <= playerPoints) {
-        splitBtn.toggleAttribute("hidden");
-      }
-    }
     checkStatus("hit");
+    checkStatus("split");
   }, animationDelay * 3.6);
 }
 
@@ -214,15 +221,16 @@ function updatePoints() {
 }
 
 async function updateHeaders() {
-  playerTotal[0] = await calculateTotal(playersHand[0]);
-  playerTotal[1] = await calculateTotal(playersHand[1]);
-  dealerTotal = await calculateTotal(dealersHand);
+  await updateHandTotals();
 
-  if (playersDiv2.hasAttribute("hidden")) {
-    playerHeader.innerText = `Player's Cards (Total: ${playerTotal[0]})`;
-  } else {
-    playerHeader.innerText = `Player's Cards (Hand 1: ${playerTotal[0]}, Hand 2: ${playerTotal[1]})`;
+  const visibleHands = playerHandElements.filter((div) => !div.hasAttribute("hidden"));
+  const handText = [];
+  for (let i = 0; i < visibleHands.length; i++) {
+    handText.push(`Hand ${i + 1}: ${playerTotal[i]}`);
   }
+
+  playerHeader.innerText = `Player's Cards (${handText.join(", ")})`;
+
   if (gameStatus !== "inProgress") {
     dealerHeader.innerText = `Dealer's Cards (Total: ${dealerTotal})`;
   }
@@ -233,21 +241,14 @@ async function hit(player = "player") {
   await updateHeaders();
 
   if (player !== "dealer") {
-    let currentWagerPlayerDiv;
-    if (currentPlayerHand === 0) {
-      currentWagerPlayerDiv = playersDiv;
-    } else if (currentPlayerHand === 1) {
-      currentWagerPlayerDiv = playersDiv2;
-    }
-    await addCard(playersHand[currentPlayerHand], currentWagerPlayerDiv, player);
+    await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], player);
   } else {
     await addCard(dealersHand, dealersDiv, player);
   }
 
-  playerTotal[0] = await calculateTotal(playersHand[0]);
-  playerTotal[1] = await calculateTotal(playersHand[1]);
+  await updateHandTotals();
   await updateHeaders();
-  dealerTotal = await calculateTotal(dealersHand);
+  await updateHandTotals();
 
   checkStatus("hit");
   setTimeout(() => {
@@ -313,59 +314,89 @@ function calculateTotal(cards) {
   });
 }
 
+async function updateHandTotals() {
+  for (let i = 0; i < playerTotal.length; i++) {
+    playerTotal[i] = await calculateTotal(playersHand[i]);
+  }
+
+  dealerTotal = await calculateTotal(dealersHand);
+}
+
 function checkStatus(type) {
   if (playerTotal[currentPlayerHand] > 21) {
     endGame(type);
   }
+
   if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
     if (playersHand[currentPlayerHand].length >= 2 && dealersHand.length >= 2) {
       endGame(type);
     }
   }
+
+  const hand = playersHand[currentPlayerHand];
+
+  const isPair = hand.length === 2 && hand[0].rank === hand[1].rank;
+  const canAffordSplit = currentWager / (splitCount + 1) <= playerPoints;
+  const isValidSplit = splitCount < 3 && type === "split";
+
+  if (isPair && currentWager > 0 && canAffordSplit && isValidSplit) {
+    if (splitBtn.hasAttribute("hidden")) {
+      splitBtn.toggleAttribute("hidden");
+    }
+  }
 }
 
-function splitHand() {
-  if (playersHand[0].length === 2 && playersHand[0][0].rank === playersHand[0][1].rank) {
+async function splitHand() {
+  if (splitCount < 3 && playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank) {
     toggleGameButtons();
+    splitCount++;
     split = true;
+    let oldHand = currentPlayerHand;
 
-    playersHand[1].push(playersHand[0].pop());
+    playersHand[splitCount].push(playersHand[currentPlayerHand].pop());
 
-    playerTotal[0] = playersHand[0][0].pointValue;
-    playerTotal[1] = playersHand[1][0].pointValue;
-    updateHeaders();
+    clearDiv(playerHandElements[currentPlayerHand]);
+    clearDiv(playerHandElements[splitCount]);
 
-    clearDiv(playersDiv);
-    playersDiv2.toggleAttribute("hidden");
-
-    for (let i = 0; i < 2; i++) {
-      let imgPath = `./assets/cards-1.3/${playersHand[i][0].image}`;
+    playersHand[currentPlayerHand].forEach((card) => {
+      let imgPath = `./assets/cards-1.3/${card.image}`;
       let img = document.createElement("img");
       img.src = imgPath;
       img.classList.add("img-fluid", "imgSlide");
-      if (i === 0) {
-        playersDiv.appendChild(img);
-      } else {
-        playersDiv2.appendChild(img);
-      }
-    }
+      playerHandElements[currentPlayerHand].appendChild(img);
+    });
 
-    setTimeout(() => hit(), animationDelay * 0.8);
+    playersHand[splitCount].forEach((card) => {
+      let imgPath = `./assets/cards-1.3/${card.image}`;
+      let img = document.createElement("img");
+      img.src = imgPath;
+      img.classList.add("img-fluid", "imgSlide");
+      playerHandElements[splitCount].appendChild(img);
+    });
+
+    playerHandElements[splitCount].toggleAttribute("hidden");
+
+    playerTotal[currentPlayerHand] = await calculateTotal(playersHand[currentPlayerHand]);
+    playerTotal[splitCount] = await calculateTotal(playersHand[splitCount]);
+    await updateHeaders();
 
     setTimeout(() => {
-      currentPlayerHand = 1;
+      hit();
+    }, animationDelay);
+
+    setTimeout(() => {
+      currentPlayerHand = splitCount;
       hit();
     }, animationDelay * 2);
 
     setTimeout(() => {
-      currentPlayerHand = 0;
-      playerTotal[1] = calculateTotal(playersHand[1]);
-      playerTotal[currentPlayerHand] = calculateTotal(playersHand[currentPlayerHand]);
-      playerPoints -= currentWager;
-      currentWager *= 2;
+      currentPlayerHand = oldHand;
+      playerPoints -= currentWager / splitCount;
+      currentWager += currentWager / splitCount;
       updatePoints();
-      playersDiv.classList.add("activeHand");
+      playerHandElements[currentPlayerHand].classList.add("activeHand");
       toggleGameButtons();
+      checkStatus("split");
     }, animationDelay * 3);
   }
 }
@@ -380,7 +411,7 @@ async function playDealer() {
 }
 
 function endGame(type) {
-  if (gameStatus === "inProgress" && (currentPlayerHand === 1 || split === false)) {
+  if (gameStatus === "inProgress" && (currentPlayerHand === splitCount || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
@@ -396,8 +427,8 @@ function endGame(type) {
       splitBtn.toggleAttribute("hidden");
     }
 
-    if (currentPlayerHand === 1 && split === true) {
-      playersDiv2.classList.remove("activeHand");
+    if (split === true) {
+      playerHandElements[currentPlayerHand].classList.remove("activeHand");
     }
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
@@ -414,32 +445,33 @@ function endGame(type) {
 
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
     setTimeout(async () => {
-      playerTotal[0] = await calculateTotal(playersHand[0]);
-      playerTotal[1] = await calculateTotal(playersHand[1]);
-      dealerTotal = await calculateTotal(dealersHand);
+      await updateHandTotals();
       await playDealer();
       messageDiv.removeChild(message);
       displayWinner();
     }, modifiedDelay);
-  } else if (currentPlayerHand === 0 && split === true) {
-    currentPlayerHand = 1;
-    playersDiv2.classList.add("activeHand");
-    playersDiv.classList.remove("activeHand");
+  } else if (currentPlayerHand < splitCount && split === true) {
+    currentPlayerHand += 1;
+    playerHandElements[currentPlayerHand].classList.add("activeHand");
+    playerHandElements[currentPlayerHand - 1].classList.remove("activeHand");
+    checkStatus("split");
   }
 }
 
 function displayWinner() {
   let winner = document.createElement("h6");
   let winner2;
+  let winner3;
+  let winner4;
   let finalHandValues = document.createElement("p");
 
   updateHeaders();
 
   let outcomes = [[], []];
+  let wagerMultiplier = 0;
 
   for (let handIndex = 0; handIndex < playersHand.length; handIndex++) {
     let outcome = "";
-    let wagerMultiplier = 0;
 
     if (playersHand[handIndex].length === 0) continue;
 
@@ -461,20 +493,28 @@ function displayWinner() {
       wagerMultiplier = 1;
     }
 
-    playerPoints += currentWager * wagerMultiplier;
-    if (currentPlayerHand === 1) {
+    playerPoints += (currentWager / (splitCount + 1)) * wagerMultiplier;
+    if (splitCount > 0) {
       outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
     } else {
       outcomes[handIndex] = `${outcome}`;
     }
 
-    winner.textContent = outcomes[0];
-    messageDiv.append(winner);
-
-    if (handIndex === 1 && playersHand[handIndex].length > 0) {
+    if (handIndex === 0) {
+      winner.textContent = outcomes[handIndex];
+      messageDiv.append(winner);
+    } else if (handIndex === 1) {
       winner2 = document.createElement("h6");
-      winner2.textContent = outcomes[1];
+      winner2.textContent = outcomes[handIndex];
       messageDiv.append(winner2);
+    } else if (handIndex === 2) {
+      winner3 = document.createElement("h6");
+      winner3.textContent = outcomes[handIndex];
+      messageDiv.append(winner3);
+    } else if (handIndex === 3) {
+      winner4 = document.createElement("h6");
+      winner4.textContent = outcomes[handIndex];
+      messageDiv.append(winner4);
     }
   }
 

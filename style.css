@@ -1,6 +1,5 @@
 #dealersHand img,
-#playersHand img,
-#playersSecondHand img {
+#playersHands > div img {
   max-height: 100% !important;
   margin-right: calc(-4vh);
   margin-left: calc(-4vh);
@@ -21,8 +20,7 @@
 }
 
 #dealersHand,
-#playersHand,
-#playersSecondHand {
+#playersHands > div {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 15px;
