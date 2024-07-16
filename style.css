@@ -1,5 +1,5 @@
-#dealersCards img,
-#playersCards img {
+#dealersHand img,
+#playersHands > div img {
   max-height: 100% !important;
   margin-right: calc(-4vh);
   margin-left: calc(-4vh);
@@ -10,12 +10,17 @@
   font-weight: bold;
 }
 
+#splitBtn {
+  padding: 4px 11.5px 4px 11.5px;
+  font-weight: bold;
+}
+
 #standBtn {
   font-weight: bold;
 }
 
-#dealersCards,
-#playersCards {
+#dealersHand,
+#playersHands > div {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 15px;
@@ -28,13 +33,13 @@
   background-color: rgb(9, 59, 9);
 }
 
-#winner h5 {
+#message h6 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
 }
 
-#winner {
-  height: 40px !important;
+#message {
+  min-height: 40px !important;
 }
 
 #main {
@@ -82,12 +87,17 @@
   height: fit-content;
 }
 
+.activeHand {
+  border: 3px solid yellow;
+  box-shadow: 0 0 8px yellow;
+}
+
 @keyframes slideIn {
   from {
-    transform: translateX(-100%);
+    transform: translate3d(-100%, 0, 0);
   }
   to {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -96,38 +106,20 @@
     transform: rotateY(90deg);
   }
   to {
-    transform: rotateY(0);
-  }
-}
-
-@-webkit-keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@-webkit-keyframes flip {
-  from {
-    transform: rotateY(90deg);
-  }
-  to {
-    transform: rotateY(0);
+    transform: rotateY(0deg);
   }
 }
 
 .imgFlip {
-  -webkit-animation: flip 0.7s ease-in-out;
-  animation: flip 0.7s ease-in-out;
+  animation: flip 0.7s linear;
   transform-style: flat;
+  z-index: 1;
 }
 
 .imgSlide {
-  -webkit-animation: slideIn 0.3s ease-in-out;
-  animation: slideIn 0.3s ease-in-out;
+  animation: slideIn 0.3s linear;
   transform-style: flat;
+  z-index: 1;
 }
 
 @keyframes flipFull {
@@ -135,25 +127,15 @@
     transform: rotateY(360deg);
   }
   to {
-    transform: rotateY(0);
-  }
-}
-
-@-webkit-keyframes flipFull {
-  from {
-    transform: rotateY(360deg);
-  }
-  to {
-    transform: rotateY(0);
+    transform: rotateY(0deg);
   }
 }
 
 .chipFlip {
-  -webkit-animation: flipFull 0.7s ease-in-out;
-  animation: flipFull 0.7s ease-in-out;
+  animation: flipFull 0.7s linear;
   transform-style: flat;
+  z-index: 1;
 }
-
 @keyframes highlight {
   0% {
     background-color: #ccc;
@@ -164,5 +146,5 @@
 }
 
 .highlight {
-  animation: highlight 0.5s ease-in-out;
+  animation: highlight 0.5s linear;
 }
