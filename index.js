@@ -18,6 +18,7 @@ const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
+const soft17Switch = document.getElementById("soft17Switch");
 
 // Game Variables
 const deck = new CardDeck();
@@ -428,12 +429,43 @@ async function splitHand() {
 
 // Play for the dealer
 async function playDealer() {
-  while (dealerTotal < 17) {
+  while (shouldDealerHit(dealerTotal)) {
     await hit("dealer");
     dealerTotal = await calculateTotal(dealersHand);
     await new Promise((resolve) => setTimeout(resolve, animationDelay));
   }
   endGame("dealer");
+}
+
+// Determine if the dealer should hit based on game rules, including soft 17
+function shouldDealerHit(total) {
+  if (soft17Switch.checked) {
+    return total < 17 || (total === 17 && isSoft17(dealersHand));
+  }
+  return total < 17;
+}
+
+// Check if a hand is a soft 17 (total 17 with an Ace counted as 11)
+function isSoft17(cards) {
+  const totalWithoutAces = calculateTotalWithoutAces(cards);
+  const numAces = countAces(cards);
+  return totalWithoutAces === 6 && numAces > 0;
+}
+
+// Calculate total points for a hand, excluding reduction of Aces to 1
+function calculateTotalWithoutAces(cards) {
+  let total = 0;
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].rank !== "ace") {
+      total += cards[i].pointValue;
+    }
+  }
+  return total;
+}
+
+// Count the number of Aces in a hand
+function countAces(cards) {
+  return cards.filter((card) => card.rank === "ace").length;
 }
 
 // End the game or move to next hand
