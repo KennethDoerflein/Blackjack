@@ -239,13 +239,15 @@ function updatePoints() {
 async function updateHeaders() {
   await updateHandTotals();
 
-  const visibleHands = playerHandElements.filter((div) => !div.hasAttribute("hidden"));
   const handText = [];
-  for (let i = 0; i < visibleHands.length; i++) {
-    handText.push(`Hand ${i + 1}: ${playerTotal[i]}`);
+  if (split) {
+    for (let i = 0; i <= splitCount; i++) {
+      handText.push(`Hand ${i + 1}: ${playerTotal[i]}`);
+    }
+    playerHeader.innerText = `Player's Cards (${handText.join(", ")})`;
+  } else {
+    playerHeader.innerText = `Player's Cards (Total: ${playerTotal[0]})`;
   }
-
-  playerHeader.innerText = `Player's Cards (${handText.join(", ")})`;
 
   if (gameStatus !== "inProgress") {
     dealerHeader.innerText = `Dealer's Cards (Total: ${dealerTotal})`;
