@@ -359,7 +359,7 @@ function checkStatus(type) {
 
   const hand = playersHand[currentPlayerHand];
 
-  const isPair = hand.length === 2 && hand[0].rank === hand[1].rank;
+  const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
   const canAffordSplit = currentWager / (splitCount + 1) <= playerPoints;
   const isValidSplit = splitCount < 3 && type === "split";
 
@@ -372,7 +372,7 @@ function checkStatus(type) {
 
 // Split the player's hand
 async function splitHand() {
-  if (splitCount < 3 && playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank) {
+  if (splitCount < 3 && playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue) {
     toggleGameButtons();
     splitCount++;
     split = true;
