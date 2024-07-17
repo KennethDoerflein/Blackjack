@@ -25,7 +25,7 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand;
 let playerPoints = 100;
 let currentWager = 0;
 
@@ -81,6 +81,7 @@ function resetGameVariables() {
   dealerTotal = 0;
   playerTotal = [0, 0, 0, 0];
   currentPlayerHand = 0;
+  oldHand = -1;
   splitCount = 0;
   gameStatus = "inProgress";
   split = false;
@@ -378,7 +379,7 @@ async function splitHand() {
     toggleGameButtons();
     splitCount++;
     split = true;
-    let oldHand = currentPlayerHand;
+    oldHand = currentPlayerHand;
 
     playersHand[splitCount].push(playersHand[currentPlayerHand].pop());
 
@@ -471,7 +472,7 @@ function countAces(cards) {
 
 // End the game or move to next hand
 function endGame(type) {
-  if (gameStatus === "inProgress" && (currentPlayerHand === splitCount || split === false)) {
+  if (gameStatus === "inProgress" && (oldHand === splitCount - 1 || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
@@ -511,9 +512,10 @@ function endGame(type) {
       displayWinner();
     }, modifiedDelay);
   } else if (currentPlayerHand < splitCount && split === true) {
+    oldHand = currentPlayerHand;
     currentPlayerHand += 1;
     playerHandElements[currentPlayerHand].classList.add("activeHand");
-    playerHandElements[currentPlayerHand - 1].classList.remove("activeHand");
+    playerHandElements[oldHand].classList.remove("activeHand");
     checkStatus("split");
   }
 }
