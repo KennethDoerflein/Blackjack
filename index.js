@@ -1,6 +1,7 @@
 // DOM Elements
 const hitBtn = document.getElementById("hitBtn");
 const splitBtn = document.getElementById("splitBtn");
+const doubleDownBtn = document.getElementById("doubleDownBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
 const dealersDiv = document.getElementById("dealersHand");
@@ -25,7 +26,7 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand, originalWager;
 let playerPoints = 100;
 let currentWager = 0;
 
@@ -116,6 +117,9 @@ function initialDeal() {
 // Toggle game buttons
 function toggleGameButtons() {
   hitBtn.toggleAttribute("hidden");
+  if (originalWager * 2 <= playerPoints) {
+    doubleDownBtn.toggleAttribute("hidden");
+  }
   standBtn.toggleAttribute("hidden");
   if (!splitBtn.hasAttribute("hidden")) {
     splitBtn.toggleAttribute("hidden");
@@ -131,6 +135,7 @@ function toggleWagerElements() {
 function removeEventListeners() {
   hitBtn.removeEventListener("click", hit);
   splitBtn.removeEventListener("click", splitHand);
+  doubleDownBtn.removeEventListener("click", doubleDown);
   standBtn.removeEventListener("click", endGame);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
@@ -144,6 +149,7 @@ function removeEventListeners() {
 function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   splitBtn.addEventListener("click", splitHand);
+  doubleDownBtn.addEventListener("click", doubleDown);
   standBtn.addEventListener("click", endGame);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
@@ -206,6 +212,7 @@ function addChipValue(event) {
 // Clear the wager
 function clearWager() {
   currentWager = 0;
+  originalWager = 0;
   updatePoints();
 }
 
@@ -222,6 +229,7 @@ function placeWager(event) {
     } else {
       playerPoints -= currentWager;
     }
+    originalWager = currentWager;
     updatePoints();
     toggleWagerElements();
     initialDeal();
@@ -362,7 +370,7 @@ function checkStatus(type) {
   const hand = playersHand[currentPlayerHand];
 
   const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
-  const canAffordSplit = currentWager / (splitCount + 1) <= playerPoints;
+  const canAffordSplit = originalWager <= playerPoints;
   const isValidSplit = splitCount < 3 && type === "split";
   const splitBtnHidden = splitBtn.hasAttribute("hidden");
 
@@ -370,6 +378,23 @@ function checkStatus(type) {
     splitBtn.toggleAttribute("hidden");
   } else if (!isPair && !splitBtnHidden) {
     splitBtn.toggleAttribute("hidden");
+  }
+
+  if (hand.length > 2) {
+    if (!doubleDownBtn.hasAttribute("hidden")) {
+      doubleDownBtn.toggleAttribute("hidden");
+    }
+  }
+}
+
+function doubleDown() {
+  logGameState("Doubling Down");
+  currentWager += originalWager;
+  playerPoints -= originalWager;
+  updatePoints();
+  hit();
+  if (playerTotal <= 21) {
+    endGame();
   }
 }
 
@@ -419,8 +444,8 @@ async function splitHand() {
 
     setTimeout(() => {
       currentPlayerHand = oldHand;
-      playerPoints -= currentWager / splitCount;
-      currentWager += currentWager / splitCount;
+      playerPoints -= originalWager;
+      currentWager += originalWager;
       updatePoints();
       playerHandElements[currentPlayerHand].classList.add("activeHand");
       toggleGameButtons();
@@ -472,7 +497,7 @@ function countAces(cards) {
 
 // End the game or move to next hand
 function endGame(type) {
-  if (gameStatus === "inProgress" && (oldHand === splitCount - 1 || split === false)) {
+  if (gameStatus === "inProgress" && ((oldHand === splitCount - 1 && currentPlayerHand === splitCount) || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
@@ -556,7 +581,7 @@ function displayWinner() {
       wagerMultiplier = 1;
     }
 
-    playerPoints += (currentWager / (splitCount + 1)) * wagerMultiplier;
+    playerPoints += originalWager * wagerMultiplier;
     if (splitCount > 0) {
       outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
     } else {

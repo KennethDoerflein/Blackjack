@@ -16,7 +16,11 @@
   font-weight: bold;
 }
 
-#standBtn {
+#standBtn,
+#newGameBtn {
+  font-weight: bold;
+}
+#doubleDownBtn {
   font-weight: bold;
 }
 
