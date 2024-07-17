@@ -472,7 +472,7 @@ function countAces(cards) {
 
 // End the game or move to next hand
 function endGame(type) {
-  if (gameStatus === "inProgress" && (oldHand === splitCount - 1 || split === false)) {
+  if (gameStatus === "inProgress" && ((oldHand === splitCount - 1 && currentPlayerHand === splitCount) || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
