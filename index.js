@@ -1,3 +1,6 @@
+// Debug mode variable
+const debugMode = false; // Set to false to disable logging
+
 // DOM Elements
 const hitBtn = document.getElementById("hitBtn");
 const splitBtn = document.getElementById("splitBtn");
@@ -101,6 +104,7 @@ function clearGameBoard() {
 
 // Initial deal
 function initialDeal() {
+  logGameState("Starting initial deal");
   hit();
   setTimeout(() => hit("dealer"), animationDelay);
   setTimeout(() => hit(), animationDelay * 2);
@@ -112,6 +116,7 @@ function initialDeal() {
     messageDiv.appendChild(message);
     checkStatus("hit");
     checkStatus("split");
+    logGameState("Initial deal complete");
   }, animationDelay * 3.6);
 }
 // Toggle game buttons
@@ -190,6 +195,7 @@ function newGame() {
 
 // Add chip value to the wager
 function addChipValue(event) {
+  logGameState("Adding chip value");
   removeChipEventListeners();
   wagerDisplay.classList.add("highlight");
   this.classList.add("chipFlip");
@@ -218,6 +224,7 @@ function clearWager() {
 
 // Place the wager
 function placeWager(event) {
+  logGameState("Placing wager");
   var id = event.target.id;
   var isWagerValid = !isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints;
   var isAllIn = id === "allInBtn";
@@ -266,6 +273,7 @@ async function updateHeaders() {
 
 // Deal a card to the player or dealer
 async function hit(player = "player") {
+  logGameState(`Hit: ${player}`);
   hitBtn.removeEventListener("click", hit);
   await updateHeaders();
 
@@ -497,6 +505,7 @@ function countAces(cards) {
 
 // End the game or move to next hand
 function endGame(type) {
+  logGameState("Ending game");
   if (gameStatus === "inProgress" && ((oldHand === splitCount - 1 && currentPlayerHand === splitCount) || split === false)) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
@@ -624,5 +633,24 @@ function toggleMusic() {
     backgroundMusic.play();
   } else {
     backgroundMusic.pause();
+  }
+}
+
+// Log game state
+function logGameState(action) {
+  if (debugMode) {
+    console.log(`[${new Date().toISOString()}] Action: ${action}`);
+    console.log(`Dealers Hand: ${JSON.stringify(dealersHand)}`);
+    console.log(`Players Hand: ${JSON.stringify(playersHand)}`);
+    console.log(`Dealer Total: ${dealerTotal}`);
+    console.log(`Player Total: ${JSON.stringify(playerTotal)}`);
+    console.log(`Current Wager: ${currentWager}`);
+    console.log(`Player Points: ${playerPoints}`);
+    console.log(`Game Status: ${gameStatus}`);
+    console.log(`Split: ${split}`);
+    console.log(`Current Player Hand: ${currentPlayerHand}`);
+    console.log(`Split Count: ${splitCount}`);
+    console.log(`Old Hand: ${oldHand}`);
+    console.log("----------------------------------");
   }
 }
