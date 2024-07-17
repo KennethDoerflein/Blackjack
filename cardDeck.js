@@ -15,6 +15,7 @@ class CardDeck {
     this.POINT_VALUES = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
 
     this.cards = this.createDeck();
+    this.dealtCards = [];
     this.preloadImages();
     this.shuffle();
   }
@@ -38,7 +39,6 @@ class CardDeck {
     images.forEach((src) => {
       const img = new Image();
       img.src = src;
-      img.onload = () => {};
     });
   }
 
@@ -51,8 +51,8 @@ class CardDeck {
   }
 
   newGame() {
-    this.cards = this.createDeck();
-    this.preloadImages();
+    this.cards = this.cards.concat(this.dealtCards);
+    this.dealtCards = [];
     this.shuffle();
   }
 
@@ -60,6 +60,8 @@ class CardDeck {
     if (this.cards.length === 0) {
       return null;
     }
-    return this.cards.pop();
+    const card = this.cards.pop();
+    this.dealtCards.push(card);
+    return card;
   }
 }
