@@ -430,7 +430,7 @@ async function splitHand() {
 
 // Play for the dealer
 async function playDealer() {
-  while (shouldDealerHit(dealerTotal)) {
+  while (shouldDealerHit(dealerTotal, dealersHand)) {
     await hit("dealer");
     dealerTotal = await calculateTotal(dealersHand);
     await new Promise((resolve) => setTimeout(resolve, animationDelay));
@@ -439,9 +439,9 @@ async function playDealer() {
 }
 
 // Determine if the dealer should hit based on game rules, including soft 17
-function shouldDealerHit(total) {
+function shouldDealerHit(total, hand) {
   if (soft17Switch.checked) {
-    return total < 17 || (total === 17 && isSoft17(dealersHand));
+    return total < 17 || (total === 17 && isSoft17(hand));
   }
   return total < 17;
 }
