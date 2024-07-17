@@ -3,6 +3,7 @@
   max-height: 100% !important;
   margin-right: calc(-4vh);
   margin-left: calc(-4vh);
+  transform-style: preserve-3d;
 }
 
 #hitBtn {
@@ -111,15 +112,11 @@
 }
 
 .imgFlip {
-  animation: flip 0.7s linear;
-  transform-style: flat;
-  z-index: 1;
+  animation: flip 0.7s ease;
 }
 
 .imgSlide {
   animation: slideIn 0.3s linear;
-  transform-style: flat;
-  z-index: 1;
 }
 
 @keyframes flipFull {
@@ -133,8 +130,7 @@
 
 .chipFlip {
   animation: flipFull 0.7s linear;
-  transform-style: flat;
-  z-index: 1;
+  transform-style: preserve-3d;
 }
 @keyframes highlight {
   0% {

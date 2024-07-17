@@ -363,11 +363,12 @@ function checkStatus(type) {
   const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
   const canAffordSplit = currentWager / (splitCount + 1) <= playerPoints;
   const isValidSplit = splitCount < 3 && type === "split";
+  const splitBtnHidden = splitBtn.hasAttribute("hidden");
 
-  if (isPair && currentWager > 0 && canAffordSplit && isValidSplit) {
-    if (splitBtn.hasAttribute("hidden")) {
-      splitBtn.toggleAttribute("hidden");
-    }
+  if (isPair && currentWager > 0 && canAffordSplit && isValidSplit && splitBtnHidden) {
+    splitBtn.toggleAttribute("hidden");
+  } else if (!isPair && !splitBtnHidden) {
+    splitBtn.toggleAttribute("hidden");
   }
 }
 
