@@ -29,7 +29,7 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand, originalWager;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand, originalWager, busy;
 let playerPoints = 100;
 let currentWager = 0;
 
@@ -88,6 +88,7 @@ function resetGameVariables() {
   oldHand = -1;
   splitCount = 0;
   gameStatus = "inProgress";
+  busy = false;
   split = false;
   playerHeader.innerText = `Player's Cards`;
   dealerHeader.innerText = `Dealer's Cards`;
@@ -110,30 +111,72 @@ function initialDeal() {
   setTimeout(() => hit(), animationDelay * 2);
   setTimeout(() => hit("dealer"), animationDelay * 3);
   setTimeout(() => {
-    toggleGameButtons();
+    showGameButtons();
     let message = document.createElement("h6");
     message.textContent = "Your Turn!";
     messageDiv.appendChild(message);
     checkStatus("hit");
     checkStatus("split");
+    checkStatus("doubleDown");
     logGameState("Initial deal complete");
   }, animationDelay * 3.6);
 }
-// Toggle game buttons
-function toggleGameButtons() {
-  hitBtn.toggleAttribute("hidden");
-  if (originalWager * 2 <= playerPoints) {
-    doubleDownBtn.toggleAttribute("hidden");
+
+// Show game buttons
+function showGameButtons() {
+  const hand = playersHand[currentPlayerHand];
+
+  const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
+  // Show or hide the hit button
+  if (playerTotal[currentPlayerHand] <= 21) {
+    if (hitBtn.hasAttribute("hidden")) {
+      hitBtn.removeAttribute("hidden");
+    }
   }
-  standBtn.toggleAttribute("hidden");
+
+  // Show or hide the stand button
+  if (standBtn.hasAttribute("hidden") && gameStatus === "inProgress") {
+    standBtn.removeAttribute("hidden");
+  }
+
+  // Show or hide the split button
+  if (isPair) {
+    if (splitBtn.hasAttribute("hidden")) {
+      splitBtn.removeAttribute("hidden");
+    }
+  }
+
+  // Show or hide the double down button
+  if (hand.length === 2 && playerTotal[currentPlayerHand] <= 21) {
+    if (doubleDownBtn.hasAttribute("hidden")) {
+      doubleDownBtn.removeAttribute("hidden");
+    }
+  }
+}
+
+// Hide game buttons
+function hideGameButtons() {
+  if (!hitBtn.hasAttribute("hidden")) {
+    hitBtn.setAttribute("hidden", true);
+  }
+  if (!standBtn.hasAttribute("hidden")) {
+    standBtn.setAttribute("hidden", true);
+  }
   if (!splitBtn.hasAttribute("hidden")) {
-    splitBtn.toggleAttribute("hidden");
+    splitBtn.setAttribute("hidden", true);
+  }
+  if (!doubleDownBtn.hasAttribute("hidden")) {
+    doubleDownBtn.setAttribute("hidden", true);
   }
 }
 
 // Toggle wager elements
 function toggleWagerElements() {
-  wagerDiv.toggleAttribute("hidden");
+  if (wagerDiv.hasAttribute("hidden")) {
+    wagerDiv.removeAttribute("hidden");
+  } else {
+    wagerDiv.setAttribute("hidden", true);
+  }
 }
 
 // Remove event listeners
@@ -365,13 +408,20 @@ async function updateHandTotals() {
 
 // Check the status of the game
 function checkStatus(type) {
+  logGameState(`Check Status (Type): ${type})`);
   if (playerTotal[currentPlayerHand] > 21) {
+    hideGameButtons();
     endGame(type);
   }
 
   if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
     if (playersHand[currentPlayerHand].length >= 2 && dealersHand.length >= 2) {
-      endGame(type);
+      hideGameButtons();
+      if (!busy) {
+        endGame(type);
+      } else if (split) {
+        advanceHand();
+      }
     }
   }
 
@@ -381,37 +431,59 @@ function checkStatus(type) {
   const canAffordSplit = originalWager <= playerPoints;
   const isValidSplit = splitCount < 3 && type === "split";
   const splitBtnHidden = splitBtn.hasAttribute("hidden");
+  const doubleDownBtnHidden = doubleDownBtn.hasAttribute("hidden");
 
   if (isPair && currentWager > 0 && canAffordSplit && isValidSplit && splitBtnHidden) {
     splitBtn.toggleAttribute("hidden");
-  } else if (!isPair && !splitBtnHidden) {
-    splitBtn.toggleAttribute("hidden");
+  } else if (hand.length > 2 && !splitBtnHidden) {
+    splitBtn.setAttribute("hidden", true);
   }
 
-  if (hand.length > 2) {
-    if (!doubleDownBtn.hasAttribute("hidden")) {
-      doubleDownBtn.toggleAttribute("hidden");
-    }
+  if (canAffordSplit && hand.length === 2 && playerTotal[currentPlayerHand] <= 21 && doubleDownBtnHidden && type === "doubleDown") {
+    doubleDownBtn.toggleAttribute("hidden");
+  } else if (hand.length > 2 && !doubleDownBtnHidden) {
+    doubleDownBtn.setAttribute("hidden", true);
   }
 }
 
-function doubleDown() {
-  logGameState("Doubling Down");
-  currentWager += originalWager;
-  playerPoints -= originalWager;
-  updatePoints();
-  hit();
-  if (playerTotal <= 21) {
-    endGame();
+async function doubleDown() {
+  if (playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && originalWager <= playerPoints) {
+    busy = true;
+    logGameState("Doubling Down");
+    hideGameButtons();
+    currentWager += originalWager;
+    playerPoints -= originalWager;
+    updatePoints();
+    hit();
+    await updateHandTotals();
+    setTimeout(() => {
+      if (splitCount > 0 && gameStatus === "inProgress") {
+        showGameButtons();
+        busy = false;
+
+        if (splitCount === currentPlayerHand) {
+          endGame();
+        } else {
+          advanceHand();
+        }
+        checkStatus("hit");
+      }
+    }, animationDelay);
   }
 }
 
 // Split the player's hand
 async function splitHand() {
-  if (splitCount < 3 && playersHand[currentPlayerHand].length === 2 && playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue) {
-    toggleGameButtons();
+  if (
+    splitCount < 3 &&
+    playersHand[currentPlayerHand].length === 2 &&
+    playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue &&
+    originalWager <= playerPoints
+  ) {
+    hideGameButtons();
     splitCount++;
     split = true;
+    busy = true;
     oldHand = currentPlayerHand;
 
     playersHand[splitCount].push(playersHand[currentPlayerHand].pop());
@@ -456,8 +528,10 @@ async function splitHand() {
       currentWager += originalWager;
       updatePoints();
       playerHandElements[currentPlayerHand].classList.add("activeHand");
-      toggleGameButtons();
+      showGameButtons();
       checkStatus("split");
+      checkStatus("doubleDown");
+      busy = false;
     }, animationDelay * 3);
   }
 }
@@ -506,21 +580,16 @@ function countAces(cards) {
 // End the game or move to next hand
 function endGame(type) {
   logGameState("Ending game");
-  if (gameStatus === "inProgress" && ((oldHand === splitCount - 1 && currentPlayerHand === splitCount) || split === false)) {
+  if (gameStatus === "inProgress" && !busy && currentPlayerHand === splitCount) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
     message.textContent = "Dealer's Turn!";
     messageDiv.appendChild(message);
 
     gameStatus = "gameOver";
-    hitBtn.toggleAttribute("hidden");
-    standBtn.toggleAttribute("hidden");
+    hideGameButtons();
     hitBtn.removeEventListener("click", hit);
     standBtn.removeEventListener("click", endGame);
-
-    if (!splitBtn.hasAttribute("hidden")) {
-      splitBtn.toggleAttribute("hidden");
-    }
 
     if (split === true) {
       playerHandElements[currentPlayerHand].classList.remove("activeHand");
@@ -545,12 +614,19 @@ function endGame(type) {
       messageDiv.removeChild(message);
       displayWinner();
     }, modifiedDelay);
-  } else if (currentPlayerHand < splitCount && split === true) {
+  } else if (currentPlayerHand !== splitCount) {
+    advanceHand();
+  }
+}
+
+function advanceHand() {
+  if (currentPlayerHand < splitCount && split === true) {
     oldHand = currentPlayerHand;
     currentPlayerHand += 1;
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     playerHandElements[oldHand].classList.remove("activeHand");
-    checkStatus("split");
+    checkStatus("hit");
+    showGameButtons();
   }
 }
 
@@ -577,20 +653,20 @@ function displayWinner() {
       wagerMultiplier = 0;
     } else if (dealerTotal > 21) {
       outcome = "Dealer Busted, Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.5;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 3;
       else wagerMultiplier = 2;
     } else if (dealerTotal > playerTotal[handIndex]) {
       outcome = "Dealer Wins";
     } else if (playerTotal[handIndex] > dealerTotal) {
       outcome = "Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.5;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 3;
       else wagerMultiplier = 2;
     } else {
       outcome = "Push (Tie)";
       wagerMultiplier = 1;
     }
 
-    playerPoints += originalWager * wagerMultiplier;
+    playerPoints += (currentWager / (splitCount + 1)) * wagerMultiplier;
     if (splitCount > 0) {
       outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
     } else {
