@@ -109,6 +109,7 @@ async function initialDeal() {
   await hit();
   await hit("dealer");
   await hit();
+  await hit("dealer");
   updateGameButtons();
   await hit("dealer");
   let message = document.createElement("h6");
