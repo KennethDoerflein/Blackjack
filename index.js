@@ -29,7 +29,7 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, oldHand, originalWager, busy;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, previousPlayerHand, originalWager, busy;
 let playerPoints = 100;
 let currentWager = 0;
 
@@ -84,7 +84,7 @@ function resetGameVariables() {
   dealerTotal = 0;
   playerTotal = [0, 0, 0, 0];
   currentPlayerHand = 0;
-  oldHand = -1;
+  previousPlayerHand = -1;
   splitCount = 0;
   gameStatus = "inProgress";
   busy = false;
@@ -427,7 +427,7 @@ async function splitHand() {
     splitCount++;
     split = true;
     busy = true;
-    oldHand = currentPlayerHand;
+    previousPlayerHand = currentPlayerHand;
 
     playersHand[splitCount].push(playersHand[currentPlayerHand].pop());
     await updateHandTotals();
@@ -446,7 +446,7 @@ async function splitHand() {
     currentPlayerHand = splitCount;
     await hit();
 
-    currentPlayerHand = oldHand;
+    currentPlayerHand = previousPlayerHand;
     playerPoints -= originalWager;
     currentWager += originalWager;
     updatePoints();
@@ -555,11 +555,11 @@ async function endGame(type) {
 function advanceHand() {
   logGameState("Advancing Hand");
   if (currentPlayerHand < splitCount && split) {
-    oldHand = currentPlayerHand;
+    previousPlayerHand = currentPlayerHand;
     currentPlayerHand += 1;
     if (currentPlayerHand <= splitCount) updateGameButtons();
     playerHandElements[currentPlayerHand].classList.add("activeHand");
-    playerHandElements[oldHand].classList.remove("activeHand");
+    playerHandElements[previousPlayerHand].classList.remove("activeHand");
     checkStatus("hit");
   }
 }
@@ -642,7 +642,7 @@ function logGameState(action) {
     console.log(`Busy: ${busy}`);
     console.log(`Current Player Hand: ${currentPlayerHand}`);
     console.log(`Split Count: ${splitCount}`);
-    console.log(`Old Hand: ${oldHand}`);
+    console.log(`Old Hand: ${previousPlayerHand}`);
     console.log("----------------------------------");
   }
 }
