@@ -7,20 +7,22 @@
 }
 
 #hitBtn {
-  padding: 4px 16.5px 4px 16.5px;
+  padding: 4px 21.5px 4px 21.5px;
   font-weight: bold;
 }
 
 #splitBtn {
-  padding: 4px 11.5px 4px 11.5px;
+  padding: 4px 16.5px 4px 16.5px;
   font-weight: bold;
 }
 
-#standBtn,
-#newGameBtn {
+#standBtn {
+  padding: 4px 13px 4px 13px;
   font-weight: bold;
 }
-#doubleDownBtn {
+
+#doubleDownBtn,
+#newGameBtn {
   font-weight: bold;
 }
 
