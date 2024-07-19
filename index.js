@@ -43,6 +43,12 @@ const playerHandElements = [
 
 // Start the game
 window.onload = async () => {
+  if (!debugMode) {
+    const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
+      keyboard: false,
+    });
+    infoModal.show();
+  }
   let message = document.createElement("h6");
   message.textContent = "Game is loading!";
   messageDiv.appendChild(message);

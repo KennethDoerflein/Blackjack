@@ -94,6 +94,72 @@
       </div>
     </div>
 
+    <button type="button" class="px-1 py-1 btn btn-sm btn-dark position-absolute top-0 start-0" data-bs-toggle="modal" data-bs-target="#infoModal">ℹ️</button>
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="infoModalLabel">Game Rules and Button Explanations</h5>
+          </div>
+          <div class="modal-body bg-light text-dark">
+            <p><strong>Disclaimer:</strong></p>
+            <p>By visiting and playing this game, you acknowledge that:</p>
+
+            <ul>
+              <li>
+                The points earned in this game are purely fictional and have no monetary value. They are for entertainment purposes only and cannot be exchanged for any goods
+                or services.
+              </li>
+              <li>The game does not promote any form of gambling.</li>
+              <li>The game is intended for users who are 18 years of age or older.</li>
+              <li>Users should play the game responsibly and ensure that game play does not interfere with their daily responsibilities.</li>
+              <li>The game rules are subject to change and users should check the rules regularly.</li>
+              <li>If you bypass this agreement in any way, it is assumed that you accept and agree to abide by these terms.</li>
+            </ul>
+
+            <hr />
+            <p><strong>Blackjack Rules:</strong></p>
+            <ol>
+              <li>The goal of blackjack is to beat the dealer's hand without going over 21.</li>
+              <li>Face cards are worth 10. Aces are worth 1 or 11, whichever makes a better hand.</li>
+              <li>Each player starts with two cards, one of the dealer's cards is hidden until the end.</li>
+              <li>To 'Hit' is to ask for another card. To 'Stand' is to hold your total and end your turn.</li>
+              <li>If you go over 21 you bust, and the dealer wins regardless of the dealer's hand.</li>
+              <li>If you are dealt 21 from the start (Ace & 10), you got a blackjack.</li>
+              <li>
+                Dealer will hit until his/her cards total 17 or higher. If the `soft17Switch` is checked, the dealer will also hit on a soft 17 (a hand totaling 17 with an Ace
+                counted as 11).
+              </li>
+            </ol>
+
+            <hr />
+            <p><strong>Button Explanations:</strong></p>
+            <ul>
+              <li><strong>Hit Button</strong>: When you hit, you're asking the dealer to give you another card.</li>
+              <li>
+                <strong>Split Button</strong>: If you have two cards of the same value, you can split them into two separate hands. The wager is the same as the original wager
+                so essentially doubling your wager. Splitting is allowed if the game is in progress, the player has not already split three times, the two cards in the hand
+                have the same point value, and the player has enough points for the wager.
+              </li>
+              <li>
+                <strong>Double Down Button</strong>: Doubling down means you double your initial wager and in exchange get one more card. This is typically used when the odds
+                are in your favor. Doubling down is allowed if the game is in progress, the player's hand has exactly two cards, the total of the hand is 21 or less, and the
+                player has enough points for the wager.
+              </li>
+              <li>
+                <strong>Stand Button</strong>: When you stand, you're choosing to not take any more cards and pass to the next hand or dealer. If the `standSwitch` is checked
+                and the player's total is 21, the game will automatically move to the dealer's turn or next hand.
+              </li>
+              <li><strong>Start/New Game Button</strong>: This button starts a new game.</li>
+            </ul>
+          </div>
+          <div class="modal-footer bg-secondary text-white">
+            <button type="button" class="mx-auto btn btn-light" data-bs-dismiss="modal">I Acknowledge and Accept</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
