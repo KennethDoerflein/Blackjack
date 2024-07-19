@@ -8,22 +8,23 @@
 
 #hitBtn {
   padding: 4px 21.5px 4px 21.5px;
-  font-weight: bold;
 }
 
 #splitBtn {
   padding: 4px 16.5px 4px 16.5px;
-  font-weight: bold;
 }
 
 #standBtn {
   padding: 4px 13px 4px 13px;
-  font-weight: bold;
 }
 
-#doubleDownBtn,
-#newGameBtn {
+#doubleDownBtn {
+  line-height: 0.9;
+}
+
+#gameActions button {
   font-weight: bold;
+  border-radius: 25px;
 }
 
 #dealersHand,
