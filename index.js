@@ -566,74 +566,56 @@ function advanceHand() {
 
 // Display result
 function displayWinner() {
-  let winner = document.createElement("h6");
-  let winner2;
-  let winner3;
-  let winner4;
-
   updateHeaders();
 
   let outcomes = [[], []];
-  let wagerMultiplier = 0;
 
   for (let handIndex = 0; handIndex < playersHand.length; handIndex++) {
-    let outcome = "";
-
     if (playersHand[handIndex].length === 0) continue;
+
+    let outcome = "";
+    let wagerMultiplier = 1;
 
     if (playerTotal[handIndex] > 21) {
       outcome = "Player Busted, Dealer Wins";
       wagerMultiplier = 0;
-    } else if (dealerTotal > 21) {
-      outcome = "Dealer Busted, Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.2;
-      else wagerMultiplier = 2;
+    } else if (dealerTotal > 21 || playerTotal[handIndex] > dealerTotal) {
+      if (playerTotal[handIndex] === 21 && playersHand[handIndex].length === 2) {
+        outcome = "Blackjack, Player Wins!";
+      } else {
+        outcome = dealerTotal > 21 ? "Dealer Busted, Player Wins" : "Player Wins";
+      }
+      wagerMultiplier = playerTotal[handIndex] === 21 && playersHand[handIndex].length === 2 ? 2.2 : 2;
     } else if (dealerTotal > playerTotal[handIndex]) {
       outcome = "Dealer Wins";
-    } else if (playerTotal[handIndex] > dealerTotal) {
-      outcome = "Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.2;
-      else wagerMultiplier = 2;
+      wagerMultiplier = 0;
     } else {
       outcome = "Push (Tie)";
-      wagerMultiplier = 1;
     }
 
-    playerPoints += Math.ceil((currentWager / (splitCount + 1)) * wagerMultiplier);
-    if (splitCount > 0) {
-      outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
-    } else {
-      outcomes[handIndex] = `${outcome}`;
-    }
+    playerPoints += Math.ceil(originalWager * wagerMultiplier);
+    outcomes[handIndex] = splitCount > 0 ? `Hand ${handIndex + 1}: ${outcome}` : outcome;
 
-    if (handIndex === 0) {
-      winner.textContent = outcomes[handIndex];
-      messageDiv.append(winner);
-    } else if (handIndex === 1) {
-      winner2 = document.createElement("h6");
-      winner2.textContent = outcomes[handIndex];
-      messageDiv.append(winner2);
-    } else if (handIndex === 2) {
-      winner3 = document.createElement("h6");
-      winner3.textContent = outcomes[handIndex];
-      messageDiv.append(winner3);
-    } else if (handIndex === 3) {
-      winner4 = document.createElement("h6");
-      winner4.textContent = outcomes[handIndex];
-      messageDiv.append(winner4);
-    }
+    let winnerElement = createWinnerElement(outcomes[handIndex]);
+    messageDiv.append(winnerElement);
   }
 
   currentWager = 0;
   updatePoints();
   if (playerPoints === 0) {
-    let message = document.createElement("h6");
-    message.textContent = "You are out of points, thank you for playing!";
+    let message = createWinnerElement("You are out of points, thank you for playing!");
     message.classList.add("mt-2", "mb-5");
     bottomDiv.appendChild(message);
   } else {
     newGameBtn.toggleAttribute("hidden");
   }
+}
+
+// Helper function to create a winner element
+function createWinnerElement(outcome) {
+  let winner = document.createElement("h6");
+  winner.textContent = outcome;
+  return winner;
 }
 
 // Toggle background music
