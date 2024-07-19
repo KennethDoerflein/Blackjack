@@ -570,7 +570,6 @@ function displayWinner() {
   let winner2;
   let winner3;
   let winner4;
-  let finalHandValues = document.createElement("p");
 
   updateHeaders();
 
@@ -587,20 +586,20 @@ function displayWinner() {
       wagerMultiplier = 0;
     } else if (dealerTotal > 21) {
       outcome = "Dealer Busted, Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 3;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.2;
       else wagerMultiplier = 2;
     } else if (dealerTotal > playerTotal[handIndex]) {
       outcome = "Dealer Wins";
     } else if (playerTotal[handIndex] > dealerTotal) {
       outcome = "Player Wins";
-      if (playerTotal[handIndex] === 21) wagerMultiplier = 3;
+      if (playerTotal[handIndex] === 21) wagerMultiplier = 2.2;
       else wagerMultiplier = 2;
     } else {
       outcome = "Push (Tie)";
       wagerMultiplier = 1;
     }
 
-    playerPoints += (currentWager / (splitCount + 1)) * wagerMultiplier;
+    playerPoints += Math.ceil((currentWager / (splitCount + 1)) * wagerMultiplier);
     if (splitCount > 0) {
       outcomes[handIndex] = `Hand ${handIndex + 1}: ${outcome}`;
     } else {
