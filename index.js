@@ -42,16 +42,15 @@ const playerHandElements = [
 ];
 
 // Start the game
-window.onload = () => {
+window.onload = async () => {
   let message = document.createElement("h6");
   message.textContent = "Game is loading!";
   messageDiv.appendChild(message);
 
-  setTimeout(() => {
-    setupEventListeners();
-    newGameBtn.toggleAttribute("hidden");
-    message.textContent = "Game is ready!";
-  }, animationDelay * 1);
+  await delay(animationDelay);
+  setupEventListeners();
+  newGameBtn.toggleAttribute("hidden");
+  message.textContent = "Game is ready!";
 };
 
 // Initialize the game
@@ -104,79 +103,47 @@ function clearGameBoard() {
 }
 
 // Initial deal
-function initialDeal() {
+async function initialDeal() {
   logGameState("Starting initial deal");
-  hit();
-  setTimeout(() => hit("dealer"), animationDelay);
-  setTimeout(() => hit(), animationDelay * 2);
-  setTimeout(() => hit("dealer"), animationDelay * 3);
-  setTimeout(() => {
-    showGameButtons();
-    let message = document.createElement("h6");
-    message.textContent = "Your Turn!";
-    messageDiv.appendChild(message);
-    checkStatus("hit");
-    checkStatus("split");
-    checkStatus("doubleDown");
-    logGameState("Initial deal complete");
-  }, animationDelay * 3.6);
+  busy = true;
+  await hit();
+  await hit("dealer");
+  await hit();
+  updateGameButtons();
+  await hit("dealer");
+  let message = document.createElement("h6");
+  message.textContent = "Your Turn!";
+  messageDiv.appendChild(message);
+  logGameState("Initial deal complete");
+  busy = false;
+  checkStatus("hit");
 }
 
-// Show game buttons
-function showGameButtons() {
+// update game buttons
+function updateGameButtons() {
   const hand = playersHand[currentPlayerHand];
 
   const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
-  // Show or hide the hit button
-  if (playerTotal[currentPlayerHand] <= 21) {
-    if (hitBtn.hasAttribute("hidden")) {
-      hitBtn.removeAttribute("hidden");
-    }
-  }
+  const canPlay = playerTotal[currentPlayerHand] <= 21 && gameStatus === "inProgress";
+  const canWager = originalWager <= playerPoints;
 
-  // Show or hide the stand button
-  if (standBtn.hasAttribute("hidden") && gameStatus === "inProgress") {
-    standBtn.removeAttribute("hidden");
-  }
-
-  // Show or hide the split button
-  if (isPair) {
-    if (splitBtn.hasAttribute("hidden")) {
-      splitBtn.removeAttribute("hidden");
-    }
-  }
-
-  // Show or hide the double down button
-  if (hand.length === 2 && playerTotal[currentPlayerHand] <= 21) {
-    if (doubleDownBtn.hasAttribute("hidden")) {
-      doubleDownBtn.removeAttribute("hidden");
-    }
-  }
+  // Update button visibility
+  hitBtn.hidden = !canPlay;
+  standBtn.hidden = gameStatus !== "inProgress";
+  splitBtn.hidden = !(isPair && splitCount < 3 && canWager);
+  doubleDownBtn.hidden = !(hand.length === 2 && canPlay && canWager);
 }
 
 // Hide game buttons
 function hideGameButtons() {
-  if (!hitBtn.hasAttribute("hidden")) {
-    hitBtn.setAttribute("hidden", true);
-  }
-  if (!standBtn.hasAttribute("hidden")) {
-    standBtn.setAttribute("hidden", true);
-  }
-  if (!splitBtn.hasAttribute("hidden")) {
-    splitBtn.setAttribute("hidden", true);
-  }
-  if (!doubleDownBtn.hasAttribute("hidden")) {
-    doubleDownBtn.setAttribute("hidden", true);
-  }
+  hitBtn.hidden = true;
+  standBtn.hidden = true;
+  splitBtn.hidden = true;
+  doubleDownBtn.hidden = true;
 }
 
-// Toggle wager elements
 function toggleWagerElements() {
-  if (wagerDiv.hasAttribute("hidden")) {
-    wagerDiv.removeAttribute("hidden");
-  } else {
-    wagerDiv.setAttribute("hidden", true);
-  }
+  wagerDiv.hidden = !wagerDiv.hidden;
 }
 
 // Remove event listeners
@@ -240,22 +207,24 @@ function newGame() {
 function addChipValue(event) {
   logGameState("Adding chip value");
   removeChipEventListeners();
-  wagerDisplay.classList.add("highlight");
-  this.classList.add("chipFlip");
-  let chipValue = parseInt(event.target.dataset.value);
-  let newWager = currentWager + chipValue;
-  if (newWager <= playerPoints && Number.isInteger(newWager)) {
-    currentWager = newWager;
-  } else if (newWager > playerPoints) {
-    alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
-    currentWager = playerPoints;
-  }
-  updatePoints();
-  setTimeout(() => {
+  requestAnimationFrame(async () => {
+    wagerDisplay.classList.add("highlight");
+    this.classList.add("chipFlip");
+
+    let chipValue = parseInt(event.target.dataset.value);
+    let newWager = currentWager + chipValue;
+    if (newWager <= playerPoints && Number.isInteger(newWager)) {
+      currentWager = newWager;
+    } else if (newWager > playerPoints) {
+      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
+      currentWager = playerPoints;
+    }
+    updatePoints();
+    await delay(flipDelay);
     this.classList.remove("chipFlip");
     setupChipEventListeners();
     wagerDisplay.classList.remove("highlight");
-  }, flipDelay);
+  });
 }
 
 // Clear the wager
@@ -297,8 +266,6 @@ function updatePoints() {
 
 // Update headers with current totals
 async function updateHeaders() {
-  await updateHandTotals();
-
   const handText = [];
   if (split) {
     for (let i = 0; i <= splitCount; i++) {
@@ -317,23 +284,24 @@ async function updateHeaders() {
 // Deal a card to the player or dealer
 async function hit(player = "player") {
   logGameState(`Hit: ${player}`);
+
   hitBtn.removeEventListener("click", hit);
+
   await updateHeaders();
 
   if (player !== "dealer") {
     await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], player);
+    checkStatus("hit");
   } else {
     await addCard(dealersHand, dealersDiv, player);
   }
 
-  await updateHandTotals();
+  if (!busy) updateGameButtons();
   await updateHeaders();
-  await updateHandTotals();
 
-  checkStatus("hit");
-  setTimeout(() => {
-    hitBtn.addEventListener("click", hit);
-  }, animationDelay / 1.2);
+  await delay(animationDelay);
+
+  hitBtn.addEventListener("click", hit);
 }
 
 // Add a card to the specified hand
@@ -347,22 +315,26 @@ function addCard(cards, div, player) {
   img.classList.add("img-fluid");
 
   return new Promise((resolve) => {
-    img.onload = () => {
+    img.onload = async () => {
       div.appendChild(img);
       requestAnimationFrame(() => {
         img.classList.add("imgSlide");
-      });
-      if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
-        let finalImgPath = `./assets/cards-1.3/${card.image}`;
-        setTimeout(() => {
-          img.classList.remove("imgSlide");
-          img.src = finalImgPath;
-          img.onload = () => {
-            flipCard(img, finalImgPath);
+        requestAnimationFrame(async () => {
+          if ((player === "dealer" && cards.length !== 2) || player !== "dealer") {
+            let finalImgPath = `./assets/cards-1.3/${card.image}`;
+            await delay(slideDelay);
+            img.classList.remove("imgSlide");
+            img.src = finalImgPath;
+            img.onload = () => {
+              flipCard(img, finalImgPath);
+              resolve();
+            };
+            await updateHandTotals();
+          } else {
             resolve();
-          };
-        }, slideDelay);
-      }
+          }
+        });
+      });
     };
   });
 }
@@ -376,6 +348,11 @@ function flipCard(cardImg, imgPath) {
       cardImg.classList.add("imgFlip");
     });
   };
+}
+
+// Utility function to create a delay
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Calculate the total points for a hand
@@ -402,7 +379,6 @@ async function updateHandTotals() {
   for (let i = 0; i < playerTotal.length; i++) {
     playerTotal[i] = await calculateTotal(playersHand[i]);
   }
-
   dealerTotal = await calculateTotal(dealersHand);
 }
 
@@ -424,28 +400,9 @@ function checkStatus(type) {
       }
     }
   }
-
-  const hand = playersHand[currentPlayerHand];
-
-  const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
-  const canAffordSplit = originalWager <= playerPoints;
-  const isValidSplit = splitCount < 3 && type === "split";
-  const splitBtnHidden = splitBtn.hasAttribute("hidden");
-  const doubleDownBtnHidden = doubleDownBtn.hasAttribute("hidden");
-
-  if (isPair && currentWager > 0 && canAffordSplit && isValidSplit && splitBtnHidden) {
-    splitBtn.toggleAttribute("hidden");
-  } else if (hand.length > 2 && !splitBtnHidden) {
-    splitBtn.setAttribute("hidden", true);
-  }
-
-  if (canAffordSplit && hand.length === 2 && playerTotal[currentPlayerHand] <= 21 && doubleDownBtnHidden && type === "doubleDown") {
-    doubleDownBtn.toggleAttribute("hidden");
-  } else if (hand.length > 2 && !doubleDownBtnHidden) {
-    doubleDownBtn.setAttribute("hidden", true);
-  }
 }
 
+// Handle a player doubling down
 async function doubleDown() {
   if (playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && originalWager <= playerPoints) {
     busy = true;
@@ -455,20 +412,16 @@ async function doubleDown() {
     playerPoints -= originalWager;
     updatePoints();
     hit();
-    await updateHandTotals();
-    setTimeout(() => {
-      if (splitCount > 0 && gameStatus === "inProgress") {
-        showGameButtons();
-        busy = false;
-
-        if (splitCount === currentPlayerHand) {
-          endGame();
-        } else {
-          advanceHand();
-        }
-        checkStatus("hit");
-      }
-    }, animationDelay);
+    await delay(animationDelay);
+    busy = false;
+    if (splitCount > 0 && gameStatus === "inProgress") {
+      checkStatus("hit");
+    }
+    if (splitCount === currentPlayerHand) {
+      endGame();
+    } else {
+      advanceHand();
+    }
   }
 }
 
@@ -509,40 +462,30 @@ async function splitHand() {
 
     playerHandElements[splitCount].toggleAttribute("hidden");
 
-    playerTotal[currentPlayerHand] = await calculateTotal(playersHand[currentPlayerHand]);
-    playerTotal[splitCount] = await calculateTotal(playersHand[splitCount]);
     await updateHeaders();
+    await delay(animationDelay);
+    await hit();
+    currentPlayerHand = splitCount;
+    await hit();
 
-    setTimeout(() => {
-      hit();
-    }, animationDelay);
-
-    setTimeout(() => {
-      currentPlayerHand = splitCount;
-      hit();
-    }, animationDelay * 2);
-
-    setTimeout(() => {
-      currentPlayerHand = oldHand;
-      playerPoints -= originalWager;
-      currentWager += originalWager;
-      updatePoints();
-      playerHandElements[currentPlayerHand].classList.add("activeHand");
-      showGameButtons();
-      checkStatus("split");
-      checkStatus("doubleDown");
-      busy = false;
-    }, animationDelay * 3);
+    currentPlayerHand = oldHand;
+    playerPoints -= originalWager;
+    currentWager += originalWager;
+    updatePoints();
+    playerHandElements[currentPlayerHand].classList.add("activeHand");
+    updateGameButtons();
+    busy = false;
   }
 }
 
 // Play for the dealer
 async function playDealer() {
+  busy = true;
   while (shouldDealerHit(dealerTotal, dealersHand)) {
     await hit("dealer");
     dealerTotal = await calculateTotal(dealersHand);
-    await new Promise((resolve) => setTimeout(resolve, animationDelay));
   }
+  busy = false;
   endGame("dealer");
 }
 
@@ -578,7 +521,7 @@ function countAces(cards) {
 }
 
 // End the game or move to next hand
-function endGame(type) {
+async function endGame(type) {
   logGameState("Ending game");
   if (gameStatus === "inProgress" && !busy && currentPlayerHand === splitCount) {
     messageDiv.removeChild(messageDiv.firstChild);
@@ -600,33 +543,35 @@ function endGame(type) {
     let imgPath = `./assets/cards-1.3/${dealersHand[1].image}`;
 
     if (type !== "hit") {
+      await delay(animationDelay * 0.3);
       flipCard(dealerSecondCardImg, imgPath);
     } else {
-      setTimeout(() => flipCard(dealerSecondCardImg, imgPath), animationDelay);
+      await delay(animationDelay);
+      flipCard(dealerSecondCardImg, imgPath);
     }
 
     updateHeaders();
 
     const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
-    setTimeout(async () => {
-      await updateHandTotals();
-      await playDealer();
-      messageDiv.removeChild(message);
-      displayWinner();
-    }, modifiedDelay);
+    await delay(modifiedDelay);
+    await playDealer();
+    messageDiv.removeChild(message);
+    displayWinner();
   } else if (currentPlayerHand !== splitCount) {
     advanceHand();
   }
 }
 
+// Advance to the next hand is splits occurred
 function advanceHand() {
-  if (currentPlayerHand < splitCount && split === true) {
+  logGameState("Advancing Hand");
+  if (currentPlayerHand < splitCount && split) {
     oldHand = currentPlayerHand;
     currentPlayerHand += 1;
+    if (currentPlayerHand <= splitCount) updateGameButtons();
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     playerHandElements[oldHand].classList.remove("activeHand");
     checkStatus("hit");
-    showGameButtons();
   }
 }
 
@@ -724,6 +669,7 @@ function logGameState(action) {
     console.log(`Player Points: ${playerPoints}`);
     console.log(`Game Status: ${gameStatus}`);
     console.log(`Split: ${split}`);
+    console.log(`Busy: ${busy}`);
     console.log(`Current Player Hand: ${currentPlayerHand}`);
     console.log(`Split Count: ${splitCount}`);
     console.log(`Old Hand: ${oldHand}`);

@@ -136,6 +136,7 @@
   animation: flipFull 0.7s linear;
   transform-style: preserve-3d;
 }
+
 @keyframes highlight {
   0% {
     background-color: #ccc;
