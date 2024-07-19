@@ -24,7 +24,7 @@
 
 #gameActions button {
   font-weight: bold;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 #dealersHand,
@@ -80,6 +80,7 @@
 #allInBtn {
   max-width: 120px;
   font-size: 12px;
+  border-radius: 10px;
 }
 
 #wagerDiv #allInBtn {
