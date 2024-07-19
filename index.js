@@ -386,7 +386,7 @@ async function updateHandTotals() {
 // Check the status of the game
 function checkStatus(type) {
   logGameState(`Check Status (Type): ${type})`);
-  if (playerTotal[currentPlayerHand] > 21) {
+  if (playerTotal[currentPlayerHand] > 21 && !busy) {
     hideGameButtons();
     endGame(type);
   }
@@ -415,9 +415,6 @@ async function doubleDown() {
     hit();
     await delay(animationDelay);
     busy = false;
-    if (splitCount > 0 && gameStatus === "inProgress") {
-      checkStatus("hit");
-    }
     if (splitCount === currentPlayerHand) {
       endGame();
     } else {
