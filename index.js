@@ -111,7 +111,6 @@ async function initialDeal() {
   await hit();
   await hit("dealer");
   updateGameButtons();
-  await hit("dealer");
   let message = document.createElement("h6");
   message.textContent = "Your Turn!";
   messageDiv.appendChild(message);
@@ -122,17 +121,12 @@ async function initialDeal() {
 
 // update game buttons
 function updateGameButtons() {
-  const hand = playersHand[currentPlayerHand];
-
-  const isPair = hand.length === 2 && hand[0].pointValue === hand[1].pointValue;
   const canPlay = playerTotal[currentPlayerHand] <= 21 && gameStatus === "inProgress";
-  const canWager = originalWager <= playerPoints;
-
   // Update button visibility
   hitBtn.hidden = !canPlay;
   standBtn.hidden = gameStatus !== "inProgress";
-  splitBtn.hidden = !(isPair && splitCount < 3 && canWager);
-  doubleDownBtn.hidden = !(hand.length === 2 && canPlay && canWager);
+  splitBtn.hidden = !isSplitAllowed();
+  doubleDownBtn.hidden = !isDoubleDownAllowed();
 }
 
 // Hide game buttons
@@ -405,7 +399,7 @@ function checkStatus(type) {
 
 // Handle a player doubling down
 async function doubleDown() {
-  if (playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && originalWager <= playerPoints) {
+  if (isDoubleDownAllowed()) {
     busy = true;
     logGameState("Doubling Down");
     hideGameButtons();
@@ -428,12 +422,7 @@ async function doubleDown() {
 
 // Split the player's hand
 async function splitHand() {
-  if (
-    splitCount < 3 &&
-    playersHand[currentPlayerHand].length === 2 &&
-    playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue &&
-    originalWager <= playerPoints
-  ) {
+  if (isSplitAllowed()) {
     hideGameButtons();
     splitCount++;
     split = true;
@@ -441,25 +430,13 @@ async function splitHand() {
     oldHand = currentPlayerHand;
 
     playersHand[splitCount].push(playersHand[currentPlayerHand].pop());
+    await updateHandTotals();
 
     clearDiv(playerHandElements[currentPlayerHand]);
     clearDiv(playerHandElements[splitCount]);
 
-    playersHand[currentPlayerHand].forEach((card) => {
-      let imgPath = `./assets/cards-1.3/${card.image}`;
-      let img = document.createElement("img");
-      img.src = imgPath;
-      img.classList.add("img-fluid", "imgSlide");
-      playerHandElements[currentPlayerHand].appendChild(img);
-    });
-
-    playersHand[splitCount].forEach((card) => {
-      let imgPath = `./assets/cards-1.3/${card.image}`;
-      let img = document.createElement("img");
-      img.src = imgPath;
-      img.classList.add("img-fluid", "imgSlide");
-      playerHandElements[splitCount].appendChild(img);
-    });
+    createAndAppendCardImages(currentPlayerHand);
+    createAndAppendCardImages(splitCount);
 
     playerHandElements[splitCount].toggleAttribute("hidden");
 
@@ -477,6 +454,17 @@ async function splitHand() {
     updateGameButtons();
     busy = false;
   }
+}
+
+// 'splitHand' helper function to create and append card images
+function createAndAppendCardImages(handIndex) {
+  playersHand[handIndex].forEach((card) => {
+    let imgPath = `./assets/cards-1.3/${card.image}`;
+    let img = document.createElement("img");
+    img.src = imgPath;
+    img.classList.add("img-fluid", "imgSlide");
+    playerHandElements[handIndex].appendChild(img);
+  });
 }
 
 // Play for the dealer
@@ -676,4 +664,22 @@ function logGameState(action) {
     console.log(`Old Hand: ${oldHand}`);
     console.log("----------------------------------");
   }
+}
+
+// Helper functions to check conditions
+function isSplitAllowed() {
+  return (
+    splitCount < 3 &&
+    playersHand[currentPlayerHand].length === 2 &&
+    playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue &&
+    isWagerAllowed()
+  );
+}
+
+function isWagerAllowed() {
+  return originalWager <= playerPoints && gameStatus === "inProgress";
+}
+
+function isDoubleDownAllowed() {
+  return playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && isWagerAllowed();
 }
