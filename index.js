@@ -21,6 +21,7 @@ const chips = document.getElementsByClassName("chip");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
+const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 
 // Game Variables
@@ -298,6 +299,8 @@ async function hit(player = "player") {
     if (playerTotal[currentPlayerHand] > 21) {
       hideGameButtons();
       await endHand("hit");
+    } else {
+      autoStandOn21();
     }
   }
 
@@ -435,6 +438,7 @@ async function splitHand() {
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     updateGameButtons();
     busy = false;
+    autoStandOn21();
   }
 }
 
@@ -541,6 +545,7 @@ function advanceHand() {
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     playerHandElements[previousPlayerHand].classList.remove("activeHand");
     updatePoints();
+    autoStandOn21();
   }
 }
 
@@ -560,7 +565,7 @@ function displayWinner() {
       wagerMultiplier = 0;
     } else if (dealerTotal > 21 || playerTotal[handIndex] > dealerTotal) {
       if (playerTotal[handIndex] === 21 && playersHand[handIndex].length === 2) {
-        outcome = "Blackjack, Player Wins!";
+        outcome = "Blackjack, Player Wins";
       } else {
         outcome = dealerTotal > 21 ? "Dealer Busted, Player Wins" : "Player Wins";
       }
@@ -642,4 +647,11 @@ function isWagerAllowed() {
 
 function isDoubleDownAllowed() {
   return playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && isWagerAllowed();
+}
+
+function autoStandOn21() {
+  logGameState("Check autoStandOn21");
+  if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
+    endHand();
+  }
 }

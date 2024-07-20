@@ -79,6 +79,10 @@
               <label class="form-check-label" for="musicSwitch">Music</label>
             </div>
             <div class="form-check form-switch">
+              <input checked class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
+              <label class="form-check-label" for="standSwitch">Automatically stand when you get 21</label>
+            </div>
+            <div class="form-check form-switch">
               <input checked class="form-check-input" type="checkbox" role="switch" id="soft17Switch" />
               <label class="form-check-label" for="soft17Switch">Dealer hits on Soft 17</label>
             </div>
@@ -142,7 +146,10 @@
                 are in your favor. Doubling down is allowed if the game is in progress, the player's hand has exactly two cards, the total of the hand is 21 or less, and the
                 player has enough points for the wager.
               </li>
-              <li><strong>Stand Button</strong>: When you stand, you're choosing to not take any more cards and pass to the next hand or dealer.</li>
+              <li>
+                <strong>Stand Button</strong>: When you stand, you're choosing to not take any more cards and pass to the next hand or dealer. If the `standSwitch` is checked
+                and the player's total is 21, the game will automatically move to the dealer's turn or next hand.
+              </li>
               <li><strong>Start/New Game Button</strong>: This button starts a new game.</li>
             </ul>
           </div>
