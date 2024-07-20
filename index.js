@@ -29,9 +29,9 @@ const deck = new CardDeck();
 const flipDelay = 700;
 const slideDelay = 300;
 const animationDelay = slideDelay + flipDelay;
-let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, previousPlayerHand, originalWager, busy;
+let dealersHand, dealerTotal, playersHand, playerTotal, gameStatus, split, currentPlayerHand, splitCount, previousPlayerHand, busy;
 let playerPoints = 100;
-let currentWager = 0;
+let currentWager = [0, 0, 0, 0];
 
 // Array for player's hand elements
 const playerHandElements = [
@@ -213,12 +213,12 @@ function addChipValue(event) {
     this.classList.add("chipFlip");
 
     let chipValue = parseInt(event.target.dataset.value);
-    let newWager = currentWager + chipValue;
+    let newWager = currentWager[currentPlayerHand] + chipValue;
     if (newWager <= playerPoints && Number.isInteger(newWager)) {
-      currentWager = newWager;
+      currentWager[currentPlayerHand] = newWager;
     } else if (newWager > playerPoints) {
       alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
-      currentWager = playerPoints;
+      currentWager[currentPlayerHand] = playerPoints;
     }
     updatePoints();
     await delay(flipDelay);
@@ -230,8 +230,7 @@ function addChipValue(event) {
 
 // Clear the wager
 function clearWager() {
-  currentWager = 0;
-  originalWager = 0;
+  currentWager[currentPlayerHand] = 0;
   updatePoints();
 }
 
@@ -239,17 +238,16 @@ function clearWager() {
 function placeWager(event) {
   logGameState("Placing wager");
   var id = event.target.id;
-  var isWagerValid = !isNaN(currentWager) && currentWager > 0 && currentWager <= playerPoints;
+  var isWagerValid = !isNaN(currentWager[currentPlayerHand]) && currentWager[currentPlayerHand] > 0 && currentWager[currentPlayerHand] <= playerPoints;
   var isAllIn = id === "allInBtn";
 
   if (isWagerValid || isAllIn) {
     if (isAllIn) {
-      currentWager = playerPoints;
+      currentWager[currentPlayerHand] = playerPoints;
       playerPoints = 0;
     } else {
-      playerPoints -= currentWager;
+      playerPoints -= currentWager[currentPlayerHand];
     }
-    originalWager = currentWager;
     updatePoints();
     toggleWagerElements();
     initialDeal();
@@ -262,7 +260,7 @@ function placeWager(event) {
 // Update points display
 function updatePoints() {
   pointsDisplay.textContent = "Points*: " + playerPoints;
-  wagerDisplay.textContent = "Current Wager: " + currentWager;
+  wagerDisplay.textContent = "Current Hand's Wager: " + currentWager[currentPlayerHand];
 }
 
 // Update headers with current totals
@@ -409,8 +407,8 @@ async function doubleDown() {
     busy = true;
     logGameState("Doubling Down");
     hideGameButtons();
-    currentWager += originalWager;
-    playerPoints -= originalWager;
+    playerPoints -= currentWager[currentPlayerHand];
+    currentWager[currentPlayerHand] *= 2;
     updatePoints();
     hit();
     await delay(animationDelay);
@@ -449,9 +447,9 @@ async function splitHand() {
     currentPlayerHand = splitCount;
     await hit();
 
+    currentWager[currentPlayerHand] = currentWager[previousPlayerHand];
     currentPlayerHand = previousPlayerHand;
-    playerPoints -= originalWager;
-    currentWager += originalWager;
+    playerPoints -= currentWager[currentPlayerHand];
     updatePoints();
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     updateGameButtons();
@@ -564,6 +562,7 @@ function advanceHand() {
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     playerHandElements[previousPlayerHand].classList.remove("activeHand");
     checkStatus("hit");
+    updatePoints();
   }
 }
 
@@ -578,7 +577,7 @@ function displayWinner() {
 
     let outcome = "";
     let wagerMultiplier = 1;
-
+    // Wagers are broken make an array of points and update that accordingly based on hand etc..
     if (playerTotal[handIndex] > 21) {
       outcome = "Player Busted, Dealer Wins";
       wagerMultiplier = 0;
@@ -596,14 +595,14 @@ function displayWinner() {
       outcome = "Push (Tie)";
     }
 
-    playerPoints += Math.ceil(originalWager * wagerMultiplier);
+    playerPoints += Math.ceil(currentWager[handIndex] * wagerMultiplier);
     outcomes[handIndex] = splitCount > 0 ? `Hand ${handIndex + 1}: ${outcome}` : outcome;
 
     let winnerElement = createWinnerElement(outcomes[handIndex]);
     messageDiv.append(winnerElement);
   }
 
-  currentWager = 0;
+  currentWager = [0, 0, 0, 0];
   updatePoints();
   if (playerPoints === 0) {
     let message = createWinnerElement("You are out of points, thank you for playing!");
@@ -638,7 +637,7 @@ function logGameState(action) {
     console.log(`Players Hand: ${JSON.stringify(playersHand)}`);
     console.log(`Dealer Total: ${dealerTotal}`);
     console.log(`Player Total: ${JSON.stringify(playerTotal)}`);
-    console.log(`Current Wager: ${currentWager}`);
+    console.log(`Current Wager: ${JSON.stringify(currentWager)}`);
     console.log(`Player Points: ${playerPoints}`);
     console.log(`Game Status: ${gameStatus}`);
     console.log(`Split: ${split}`);
@@ -661,7 +660,7 @@ function isSplitAllowed() {
 }
 
 function isWagerAllowed() {
-  return originalWager <= playerPoints && gameStatus === "inProgress";
+  return currentWager[currentPlayerHand] <= playerPoints && gameStatus === "inProgress";
 }
 
 function isDoubleDownAllowed() {
