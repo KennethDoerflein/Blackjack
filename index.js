@@ -331,12 +331,10 @@ function addCard(cards, div, player) {
             img.src = finalImgPath;
             img.onload = () => {
               flipCard(img, finalImgPath);
-              resolve();
             };
-          } else {
-            resolve();
           }
           await updateHandTotals();
+          resolve();
         });
       });
     };
