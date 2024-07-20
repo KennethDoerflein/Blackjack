@@ -577,7 +577,6 @@ function displayWinner() {
 
     let outcome = "";
     let wagerMultiplier = 1;
-    // Wagers are broken make an array of points and update that accordingly based on hand etc..
     if (playerTotal[handIndex] > 21) {
       outcome = "Player Busted, Dealer Wins";
       wagerMultiplier = 0;
