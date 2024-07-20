@@ -21,7 +21,6 @@ const chips = document.getElementsByClassName("chip");
 const bottomDiv = document.getElementById("bottomDiv");
 const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
-const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 
 // Game Variables
@@ -122,7 +121,6 @@ async function initialDeal() {
   messageDiv.appendChild(message);
   logGameState("Initial deal complete");
   busy = false;
-  checkStatus("hit");
 }
 
 // update game buttons
@@ -152,7 +150,7 @@ function removeEventListeners() {
   hitBtn.removeEventListener("click", hit);
   splitBtn.removeEventListener("click", splitHand);
   doubleDownBtn.removeEventListener("click", doubleDown);
-  standBtn.removeEventListener("click", endGame);
+  standBtn.removeEventListener("click", endHand);
   newGameBtn.removeEventListener("click", newGame);
   wagerBtn.removeEventListener("click", placeWager);
   allInBtn.removeEventListener("click", placeWager);
@@ -166,7 +164,7 @@ function setupEventListeners() {
   hitBtn.addEventListener("click", hit);
   splitBtn.addEventListener("click", splitHand);
   doubleDownBtn.addEventListener("click", doubleDown);
-  standBtn.addEventListener("click", endGame);
+  standBtn.addEventListener("click", endHand);
   newGameBtn.addEventListener("click", newGame);
   wagerBtn.addEventListener("click", placeWager);
   allInBtn.addEventListener("click", placeWager);
@@ -290,16 +288,20 @@ async function hit(player = "player") {
 
   if (player !== "dealer") {
     await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], player);
-    checkStatus("hit");
   } else {
     await addCard(dealersHand, dealersDiv, player);
   }
 
-  if (!busy) updateGameButtons();
   await updateHeaders();
+  if (!busy) {
+    updateGameButtons();
+    if (playerTotal[currentPlayerHand] > 21) {
+      hideGameButtons();
+      await endHand("hit");
+    }
+  }
 
   await delay(animationDelay);
-
   hitBtn.addEventListener("click", hit);
 }
 
@@ -381,26 +383,6 @@ async function updateHandTotals() {
   dealerTotal = await calculateTotal(dealersHand);
 }
 
-// Check the status of the game
-function checkStatus(type) {
-  logGameState(`Check Status (Type): ${type})`);
-  if (playerTotal[currentPlayerHand] > 21 && !busy) {
-    hideGameButtons();
-    endGame(type);
-  }
-
-  if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
-    if (playersHand[currentPlayerHand].length >= 2 && dealersHand.length >= 2) {
-      hideGameButtons();
-      if (!busy) {
-        endGame(type);
-      } else if (split) {
-        advanceHand();
-      }
-    }
-  }
-}
-
 // Handle a player doubling down
 async function doubleDown() {
   if (isDoubleDownAllowed()) {
@@ -411,10 +393,9 @@ async function doubleDown() {
     currentWager[currentPlayerHand] *= 2;
     updatePoints();
     await hit();
-    await delay(animationDelay);
     busy = false;
     if (splitCount === currentPlayerHand) {
-      endGame();
+      endHand();
     } else {
       advanceHand();
     }
@@ -476,7 +457,6 @@ async function playDealer() {
     dealerTotal = await calculateTotal(dealersHand);
   }
   busy = false;
-  endGame("dealer");
 }
 
 // Determine if the dealer should hit based on game rules, including soft 17
@@ -511,8 +491,8 @@ function countAces(cards) {
 }
 
 // End the game or move to next hand
-async function endGame(type) {
-  logGameState("Ending game");
+async function endHand(type) {
+  logGameState("Ending hand");
   if (gameStatus === "inProgress" && !busy && currentPlayerHand === splitCount) {
     messageDiv.removeChild(messageDiv.firstChild);
     let message = document.createElement("h6");
@@ -522,7 +502,7 @@ async function endGame(type) {
     gameStatus = "gameOver";
     hideGameButtons();
     hitBtn.removeEventListener("click", hit);
-    standBtn.removeEventListener("click", endGame);
+    standBtn.removeEventListener("click", endHand);
 
     if (split === true) {
       playerHandElements[currentPlayerHand].classList.remove("activeHand");
@@ -542,8 +522,7 @@ async function endGame(type) {
 
     updateHeaders();
 
-    const modifiedDelay = type === "hit" ? 2 * animationDelay : animationDelay;
-    await delay(modifiedDelay);
+    if (shouldDealerHit(dealerTotal, dealersHand)) await delay(flipDelay);
     await playDealer();
     messageDiv.removeChild(message);
     displayWinner();
@@ -561,7 +540,6 @@ function advanceHand() {
     if (currentPlayerHand <= splitCount) updateGameButtons();
     playerHandElements[currentPlayerHand].classList.add("activeHand");
     playerHandElements[previousPlayerHand].classList.remove("activeHand");
-    checkStatus("hit");
     updatePoints();
   }
 }
