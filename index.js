@@ -410,7 +410,7 @@ async function doubleDown() {
     playerPoints -= currentWager[currentPlayerHand];
     currentWager[currentPlayerHand] *= 2;
     updatePoints();
-    hit();
+    await hit();
     await delay(animationDelay);
     busy = false;
     if (splitCount === currentPlayerHand) {
