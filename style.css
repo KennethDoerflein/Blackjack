@@ -97,8 +97,8 @@
 }
 
 .activeHand {
-  border: 3px solid yellow;
-  box-shadow: 0 0 8px yellow;
+  border: 5px solid yellow;
+  box-shadow: 0 0 15px yellow;
 }
 
 @keyframes slideIn {
