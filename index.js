@@ -62,7 +62,7 @@ window.onload = async () => {
 // Initialize the game
 function initializeGame() {
   if (playerPoints !== 0) {
-    if (split === true) {
+    if (splitCount > 0) {
       for (let i = 1; i < playerHandElements.length; i++) {
         if (!playerHandElements[i].hasAttribute("hidden")) {
           playerHandElements[i].toggleAttribute("hidden");
