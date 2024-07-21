@@ -118,6 +118,7 @@ async function initialDeal() {
   message.textContent = "Your Turn!";
   messageDiv.appendChild(message);
   logGameState("Initial deal complete");
+  autoStandOn21();
   enableGameButtons();
 }
 
