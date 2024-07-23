@@ -1,3 +1,5 @@
+// ############# Global Variables and Constants #############
+
 // Debug mode variable
 const debugMode = false; // Set to false to disable logging
 
@@ -41,7 +43,9 @@ const playerHandElements = [
   document.getElementById("playersFourthHand"),
 ];
 
-// Start the game
+// ############# Initialization and Setup #############
+
+// Start the game and show the info modal if not in debug mode
 window.onload = async () => {
   if (!debugMode) {
     const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
@@ -59,7 +63,7 @@ window.onload = async () => {
   message.textContent = "Game is ready!";
 };
 
-// Initialize the game
+// Initialize the game state and UI
 function initializeGame() {
   if (playerPoints !== 0) {
     if (splitCount > 0) {
@@ -83,7 +87,7 @@ function initializeGame() {
   }
 }
 
-// Reset game variables
+// Reset game variables to their initial state
 function resetGameVariables() {
   dealersHand = [];
   playersHand = [[], [], [], []];
@@ -96,7 +100,7 @@ function resetGameVariables() {
   dealerHeader.innerText = `Dealer's Cards`;
 }
 
-// Clear game board
+// Clear the game board of any existing elements
 function clearGameBoard() {
   for (let i = 0; i < playerHandElements.length; i++) {
     clearDiv(playerHandElements[i]);
@@ -105,7 +109,60 @@ function clearGameBoard() {
   clearDiv(messageDiv);
 }
 
-// Initial deal
+// Setup event listeners for game controls
+function setupEventListeners() {
+  hitBtn.addEventListener("click", hit);
+  splitBtn.addEventListener("click", splitHand);
+  doubleDownBtn.addEventListener("click", doubleDown);
+  standBtn.addEventListener("click", endHand);
+  newGameBtn.addEventListener("click", newGame);
+  wagerBtn.addEventListener("click", placeWager);
+  allInBtn.addEventListener("click", placeWager);
+  wagerRst.addEventListener("click", clearWager);
+  musicSwitch.addEventListener("click", toggleMusic);
+  setupChipEventListeners();
+}
+
+// Remove event listeners for game controls
+function removeEventListeners() {
+  hitBtn.removeEventListener("click", hit);
+  splitBtn.removeEventListener("click", splitHand);
+  doubleDownBtn.removeEventListener("click", doubleDown);
+  standBtn.removeEventListener("click", endHand);
+  newGameBtn.removeEventListener("click", newGame);
+  wagerBtn.removeEventListener("click", placeWager);
+  allInBtn.removeEventListener("click", placeWager);
+  wagerRst.removeEventListener("click", clearWager);
+  musicSwitch.removeEventListener("click", toggleMusic);
+  removeChipEventListeners();
+}
+
+// Setup event listeners for chip interactions
+function setupChipEventListeners() {
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].addEventListener("click", addChipValue);
+  }
+}
+
+// Remove event listeners for chip interactions
+function removeChipEventListeners() {
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].removeEventListener("click", addChipValue);
+  }
+}
+
+// Toggle background music based on the switch state
+function toggleMusic() {
+  if (musicSwitch.checked) {
+    backgroundMusic.play();
+  } else {
+    backgroundMusic.pause();
+  }
+}
+
+// ############# Game Actions #############
+
+// Deal initial cards to player and dealer
 async function initialDeal() {
   logGameState("Starting initial deal");
   disableGameButtons();
@@ -122,158 +179,12 @@ async function initialDeal() {
   enableGameButtons();
 }
 
-// update game buttons
-function updateGameButtons() {
-  const canPlay = playerTotal[currentPlayerHand] <= 21;
-  // Update button visibility
-  hitBtn.hidden = !canPlay;
-  standBtn.hidden = false;
-  splitBtn.hidden = !isSplitAllowed();
-  doubleDownBtn.hidden = !isDoubleDownAllowed();
-}
-
-// Hide game buttons
-function hideGameButtons() {
-  hitBtn.hidden = true;
-  standBtn.hidden = true;
-  splitBtn.hidden = true;
-  doubleDownBtn.hidden = true;
-}
-
-function toggleWagerElements() {
-  wagerDiv.hidden = !wagerDiv.hidden;
-}
-
-// Remove event listeners
-function removeEventListeners() {
-  hitBtn.removeEventListener("click", hit);
-  splitBtn.removeEventListener("click", splitHand);
-  doubleDownBtn.removeEventListener("click", doubleDown);
-  standBtn.removeEventListener("click", endHand);
-  newGameBtn.removeEventListener("click", newGame);
-  wagerBtn.removeEventListener("click", placeWager);
-  allInBtn.removeEventListener("click", placeWager);
-  wagerRst.removeEventListener("click", clearWager);
-  musicSwitch.removeEventListener("click", toggleMusic);
-  removeChipEventListeners();
-}
-
-// Setup event listeners
-function setupEventListeners() {
-  hitBtn.addEventListener("click", hit);
-  splitBtn.addEventListener("click", splitHand);
-  doubleDownBtn.addEventListener("click", doubleDown);
-  standBtn.addEventListener("click", endHand);
-  newGameBtn.addEventListener("click", newGame);
-  wagerBtn.addEventListener("click", placeWager);
-  allInBtn.addEventListener("click", placeWager);
-  wagerRst.addEventListener("click", clearWager);
-  musicSwitch.addEventListener("click", toggleMusic);
-  setupChipEventListeners();
-}
-
-// Setup chip event listeners
-function setupChipEventListeners() {
-  for (let i = 0; i < chips.length; i++) {
-    chips[i].addEventListener("click", addChipValue);
-  }
-}
-
-// Remove chip event listeners
-function removeChipEventListeners() {
-  for (let i = 0; i < chips.length; i++) {
-    chips[i].removeEventListener("click", addChipValue);
-  }
-}
-
-// Clear div content
-function clearDiv(div) {
-  while (div.firstChild) {
-    div.removeChild(div.firstChild);
-  }
-}
-
-// Start a new game
+// Start a new game by shuffling the deck and resetting the UI
 function newGame() {
   newGameBtn.toggleAttribute("hidden");
   deck.newGame();
   initializeGame();
   toggleMusic();
-}
-
-// Add chip value to the wager
-function addChipValue(event) {
-  logGameState("Adding chip value");
-  removeChipEventListeners();
-  requestAnimationFrame(async () => {
-    wagerDisplay.classList.add("highlight");
-    event.target.classList.add("chipFlip");
-
-    let chipValue = parseInt(event.target.dataset.value);
-    let newWager = currentWager[currentPlayerHand] + chipValue;
-    if (newWager <= playerPoints && Number.isInteger(newWager)) {
-      currentWager[currentPlayerHand] = newWager;
-    } else if (newWager > playerPoints) {
-      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
-      currentWager[currentPlayerHand] = playerPoints;
-    }
-    updatePoints();
-    await delay(flipDelay);
-    event.target.classList.remove("chipFlip");
-    setupChipEventListeners();
-    wagerDisplay.classList.remove("highlight");
-  });
-}
-
-// Clear the wager
-function clearWager() {
-  currentWager[currentPlayerHand] = 0;
-  updatePoints();
-}
-
-// Place the wager
-function placeWager(event) {
-  logGameState("Placing wager");
-  var id = event.target.id;
-  var isWagerValid = !isNaN(currentWager[currentPlayerHand]) && currentWager[currentPlayerHand] > 0 && currentWager[currentPlayerHand] <= playerPoints;
-  var isAllIn = id === "allInBtn";
-
-  if (isWagerValid || isAllIn) {
-    if (isAllIn) {
-      currentWager[currentPlayerHand] = playerPoints;
-      playerPoints = 0;
-    } else {
-      playerPoints -= currentWager[currentPlayerHand];
-    }
-    updatePoints();
-    toggleWagerElements();
-    initialDeal();
-    clearDiv(messageDiv);
-  } else {
-    alert("The wager must be a number and greater than 0.");
-  }
-}
-
-// Update points display
-function updatePoints() {
-  pointsDisplay.textContent = "Points*: " + playerPoints;
-  wagerDisplay.textContent = "Current Hand's Wager: " + currentWager[currentPlayerHand];
-}
-
-// Update headers with current totals
-async function updateHeaders(origin) {
-  const handText = [];
-  if (splitCount > 0) {
-    for (let i = 0; i <= splitCount; i++) {
-      handText.push(`Hand ${i + 1}: ${playerTotal[i]}`);
-    }
-    playerHeader.innerText = `Player's Cards (${handText.join(", ")})`;
-  } else {
-    playerHeader.innerText = `Player's Cards (Total: ${playerTotal[0]})`;
-  }
-  if (origin === "endGame") {
-    dealerHeader.innerText = `Dealer's Cards (Total: ${dealerTotal})`;
-  }
 }
 
 // Deal a card to the player or dealer
@@ -305,78 +216,7 @@ async function hit(entity = "player", origin = "user") {
   hitBtn.addEventListener("click", hit);
 }
 
-// Add a card to the specified hand
-function addCard(cards, div, entity) {
-  const card = deck.getCard();
-  cards.push(card);
-
-  let imgPath = "./assets/cards-1.3/back.png";
-  let img = document.createElement("img");
-  img.src = imgPath;
-  img.classList.add("img-fluid");
-
-  return new Promise((resolve) => {
-    img.onload = async () => {
-      div.appendChild(img);
-      requestAnimationFrame(() => {
-        img.classList.add("imgSlide");
-        requestAnimationFrame(async () => {
-          if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
-            let finalImgPath = `./assets/cards-1.3/${card.image}`;
-            await delay(slideDelay);
-            img.classList.remove("imgSlide");
-            img.src = finalImgPath;
-            img.onload = () => {
-              flipCard(img, finalImgPath);
-            };
-          }
-          await updateHandTotals();
-          resolve();
-        });
-      });
-    };
-  });
-}
-
-// Flip the card over
-function flipCard(cardImg, imgPath) {
-  cardImg.classList.remove("imgSlide");
-  cardImg.src = imgPath;
-  cardImg.onload = () => {
-    requestAnimationFrame(() => {
-      cardImg.classList.add("imgFlip");
-    });
-  };
-}
-
-// Calculate the total points for a hand
-function calculateTotal(cards) {
-  return new Promise((resolve) => {
-    let total = 0;
-    let aces = 0;
-    for (let i = 0; i < cards.length; i++) {
-      total += cards[i].pointValue;
-      if (cards[i].rank === "ace") {
-        aces++;
-      }
-    }
-    while (total > 21 && aces > 0) {
-      total -= 10;
-      aces--;
-    }
-    resolve(total);
-  });
-}
-
-// Update the totals for the player's hands and the dealer's hand
-async function updateHandTotals() {
-  for (let i = 0; i < playerTotal.length; i++) {
-    playerTotal[i] = await calculateTotal(playersHand[i]);
-  }
-  dealerTotal = await calculateTotal(dealersHand);
-}
-
-// Handle a player doubling down
+// Handle the player doubling down their wager
 async function doubleDown() {
   if (isDoubleDownAllowed()) {
     logGameState("Doubling Down");
@@ -390,7 +230,7 @@ async function doubleDown() {
   }
 }
 
-// Split the player's hand
+// Split the player's hand into two separate hands
 async function splitHand() {
   if (isSplitAllowed()) {
     disableGameButtons();
@@ -425,18 +265,7 @@ async function splitHand() {
   }
 }
 
-// 'splitHand' helper function to create and append card images
-function createAndAppendCardImages(handIndex) {
-  playersHand[handIndex].forEach((card) => {
-    let imgPath = `./assets/cards-1.3/${card.image}`;
-    let img = document.createElement("img");
-    img.src = imgPath;
-    img.classList.add("img-fluid", "imgSlide");
-    playerHandElements[handIndex].appendChild(img);
-  });
-}
-
-// Play for the dealer
+// Play the dealer's hand according to the rules
 async function playDealer() {
   while (shouldDealerHit(dealerTotal, dealersHand)) {
     await hit("dealer", "endGame");
@@ -444,38 +273,7 @@ async function playDealer() {
   }
 }
 
-// Determine if the dealer should hit based on game rules, including soft 17
-function shouldDealerHit(total, hand) {
-  if (soft17Switch.checked) {
-    return total < 17 || (total === 17 && isSoft17(hand));
-  }
-  return total < 17;
-}
-
-// Check if a hand is a soft 17 (total 17 with an Ace counted as 11)
-function isSoft17(cards) {
-  const totalWithoutAces = calculateTotalWithoutAces(cards);
-  const numAces = countAces(cards);
-  return totalWithoutAces === 6 && numAces > 0;
-}
-
-// Calculate total points for a hand, excluding reduction of Aces to 1
-function calculateTotalWithoutAces(cards) {
-  let total = 0;
-  for (let i = 0; i < cards.length; i++) {
-    if (cards[i].rank !== "ace") {
-      total += cards[i].pointValue;
-    }
-  }
-  return total;
-}
-
-// Count the number of Aces in a hand
-function countAces(cards) {
-  return cards.filter((card) => card.rank === "ace").length;
-}
-
-// End the game or move to next hand
+// End the current hand and proceed to the next hand or end the game
 async function endHand() {
   logGameState("Ending hand");
   if (currentPlayerHand === splitCount) {
@@ -510,7 +308,7 @@ async function endHand() {
   }
 }
 
-// Advance to the next hand is splits occurred
+// Advance to the next player hand if splits occurred
 function advanceHand() {
   logGameState("Advancing Hand");
   if (currentPlayerHand < splitCount && splitCount > 0) {
@@ -524,7 +322,7 @@ function advanceHand() {
   }
 }
 
-// Display result
+// Display the outcome of the game and update player points
 function displayWinner() {
   updateHeaders("endGame");
 
@@ -570,7 +368,234 @@ function displayWinner() {
   }
 }
 
-// Log game state
+// ############# Card Management and Display #############
+
+// Add a card to the specified hand and update UI
+function addCard(cards, div, entity) {
+  const card = deck.getCard();
+  cards.push(card);
+
+  let imgPath = "./assets/cards-1.3/back.png";
+  let img = document.createElement("img");
+  img.src = imgPath;
+  img.classList.add("img-fluid");
+
+  return new Promise((resolve) => {
+    img.onload = async () => {
+      div.appendChild(img);
+      requestAnimationFrame(() => {
+        img.classList.add("imgSlide");
+        requestAnimationFrame(async () => {
+          if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
+            let finalImgPath = `./assets/cards-1.3/${card.image}`;
+            await delay(slideDelay);
+            img.classList.remove("imgSlide");
+            img.src = finalImgPath;
+            img.onload = () => {
+              flipCard(img, finalImgPath);
+            };
+          }
+          await updateHandTotals();
+          resolve();
+        });
+      });
+    };
+  });
+}
+
+// Flip the card image to reveal its face
+function flipCard(cardImg, imgPath) {
+  cardImg.classList.remove("imgSlide");
+  cardImg.src = imgPath;
+  cardImg.onload = () => {
+    requestAnimationFrame(() => {
+      cardImg.classList.add("imgFlip");
+    });
+  };
+}
+
+// Create and append card images to the player's hand
+function createAndAppendCardImages(handIndex) {
+  playersHand[handIndex].forEach((card) => {
+    let imgPath = `./assets/cards-1.3/${card.image}`;
+    let img = document.createElement("img");
+    img.src = imgPath;
+    img.classList.add("img-fluid", "imgSlide");
+    playerHandElements[handIndex].appendChild(img);
+  });
+}
+
+// ############# Hand and Total Calculations #############
+
+// Calculate the total points for a given hand
+function calculateTotal(cards) {
+  return new Promise((resolve) => {
+    let total = 0;
+    let aces = 0;
+    for (let i = 0; i < cards.length; i++) {
+      total += cards[i].pointValue;
+      if (cards[i].rank === "ace") {
+        aces++;
+      }
+    }
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    resolve(total);
+  });
+}
+
+// Update the totals for all player hands and dealer hand
+async function updateHandTotals() {
+  for (let i = 0; i < playerTotal.length; i++) {
+    playerTotal[i] = await calculateTotal(playersHand[i]);
+  }
+  dealerTotal = await calculateTotal(dealersHand);
+}
+
+// Automatically stand if the player’s total is 21
+function autoStandOn21() {
+  logGameState("Check autoStandOn21");
+  if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
+    endHand();
+  }
+}
+
+// Check if a hand is a soft 17 (total 17 with an Ace counted as 11)
+function isSoft17(cards) {
+  const totalWithoutAces = calculateTotalWithoutAces(cards);
+  const numAces = countAces(cards);
+  return totalWithoutAces === 6 && numAces > 0;
+}
+
+// Calculate total points for a hand, excluding reduction of Aces to 1
+function calculateTotalWithoutAces(cards) {
+  let total = 0;
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].rank !== "ace") {
+      total += cards[i].pointValue;
+    }
+  }
+  return total;
+}
+
+// Count the number of Aces in a hand
+function countAces(cards) {
+  return cards.filter((card) => card.rank === "ace").length;
+}
+
+// ############# Wager Management #############
+
+// Update the display of player points and current wager
+function updatePoints() {
+  pointsDisplay.textContent = "Points*: " + playerPoints;
+  wagerDisplay.textContent = "Current Hand's Wager: " + currentWager[currentPlayerHand];
+}
+
+// Add chip value to the current wager
+function addChipValue(event) {
+  logGameState("Adding chip value");
+  removeChipEventListeners();
+  requestAnimationFrame(async () => {
+    wagerDisplay.classList.add("highlight");
+    event.target.classList.add("chipFlip");
+
+    let chipValue = parseInt(event.target.dataset.value);
+    let newWager = currentWager[currentPlayerHand] + chipValue;
+    if (newWager <= playerPoints && Number.isInteger(newWager)) {
+      currentWager[currentPlayerHand] = newWager;
+    } else if (newWager > playerPoints) {
+      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
+      currentWager[currentPlayerHand] = playerPoints;
+    }
+    updatePoints();
+    await delay(flipDelay);
+    event.target.classList.remove("chipFlip");
+    setupChipEventListeners();
+    wagerDisplay.classList.remove("highlight");
+  });
+}
+
+// Place the wager and start the initial deal
+function placeWager(event) {
+  logGameState("Placing wager");
+  var id = event.target.id;
+  var isWagerValid = !isNaN(currentWager[currentPlayerHand]) && currentWager[currentPlayerHand] > 0 && currentWager[currentPlayerHand] <= playerPoints;
+  var isAllIn = id === "allInBtn";
+
+  if (isWagerValid || isAllIn) {
+    if (isAllIn) {
+      currentWager[currentPlayerHand] = playerPoints;
+      playerPoints = 0;
+    } else {
+      playerPoints -= currentWager[currentPlayerHand];
+    }
+    updatePoints();
+    toggleWagerElements();
+    initialDeal();
+    clearDiv(messageDiv);
+  } else {
+    alert("The wager must be a number and greater than 0.");
+  }
+}
+
+// Toggle the visibility of wager elements
+function toggleWagerElements() {
+  wagerDiv.hidden = !wagerDiv.hidden;
+}
+
+// ############# UI Updates #############
+
+// Update the headers with current player and dealer totals
+async function updateHeaders(origin) {
+  const handText = [];
+  if (splitCount > 0) {
+    for (let i = 0; i <= splitCount; i++) {
+      handText.push(`Hand ${i + 1}: ${playerTotal[i]}`);
+    }
+    playerHeader.innerText = `Player's Cards (${handText.join(", ")})`;
+  } else {
+    playerHeader.innerText = `Player's Cards (Total: ${playerTotal[0]})`;
+  }
+  if (origin === "endGame") {
+    dealerHeader.innerText = `Dealer's Cards (Total: ${dealerTotal})`;
+  }
+}
+
+// Update game buttons based on current game state
+function updateGameButtons() {
+  const canPlay = playerTotal[currentPlayerHand] <= 21;
+  // Update button visibility
+  hitBtn.hidden = !canPlay;
+  standBtn.hidden = false;
+  splitBtn.hidden = !isSplitAllowed();
+  doubleDownBtn.hidden = !isDoubleDownAllowed();
+}
+
+// Hide game buttons from view
+function hideGameButtons() {
+  hitBtn.hidden = true;
+  standBtn.hidden = true;
+  splitBtn.hidden = true;
+  doubleDownBtn.hidden = true;
+}
+
+// Clear all child elements from a given div
+function clearDiv(div) {
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
+  }
+}
+
+// ############# Utilities and Debugging #############
+
+// Create a delay in milliseconds
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Log the game state to the console for debugging
 function logGameState(action) {
   if (debugMode) {
     console.log(`[${new Date().toISOString()}] Action: ${action}`);
@@ -587,15 +612,15 @@ function logGameState(action) {
   }
 }
 
-// ############# Helper Functions #############
-
-// Helper function to create a winner element
-function createWinnerElement(outcome) {
-  let winner = document.createElement("h6");
-  winner.textContent = outcome;
-  return winner;
+// Determine if the dealer should hit based on game rules
+function shouldDealerHit(total, hand) {
+  if (soft17Switch.checked) {
+    return total < 17 || (total === 17 && isSoft17(hand));
+  }
+  return total < 17;
 }
 
+// Check if splitting is allowed based on current hand and rules
 function isSplitAllowed() {
   return (
     splitCount < 3 &&
@@ -605,27 +630,27 @@ function isSplitAllowed() {
   );
 }
 
-function isWagerAllowed() {
-  return currentWager[currentPlayerHand] <= playerPoints;
-}
-
+// Check if doubling down is allowed based on current hand and rules
 function isDoubleDownAllowed() {
   return playersHand[currentPlayerHand].length === 2 && playerTotal[currentPlayerHand] <= 21 && isWagerAllowed();
 }
 
-function autoStandOn21() {
-  logGameState("Check autoStandOn21");
-  if (playerTotal[currentPlayerHand] === 21 && standSwitch.checked) {
-    endHand();
-  }
+// Check if the current wager is allowed based on player points
+function isWagerAllowed() {
+  return currentWager[currentPlayerHand] <= playerPoints;
 }
 
-// Disable game buttons
-function disableGameButtons() {
-  hitBtn.disabled = true;
-  standBtn.disabled = true;
-  splitBtn.disabled = true;
-  doubleDownBtn.disabled = true;
+// Clear the wager for the current hand
+function clearWager() {
+  currentWager[currentPlayerHand] = 0;
+  updatePoints();
+}
+
+// Create and return a winner element with the outcome text
+function createWinnerElement(outcome) {
+  let winner = document.createElement("h6");
+  winner.textContent = outcome;
+  return winner;
 }
 
 // Enable game buttons
@@ -636,16 +661,10 @@ function enableGameButtons() {
   doubleDownBtn.disabled = false;
 }
 
-// Utility function to create a delay
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-// Toggle background music
-function toggleMusic() {
-  if (musicSwitch.checked) {
-    backgroundMusic.play();
-  } else {
-    backgroundMusic.pause();
-  }
+// Disable game buttons
+function disableGameButtons() {
+  hitBtn.disabled = true;
+  standBtn.disabled = true;
+  splitBtn.disabled = true;
+  doubleDownBtn.disabled = true;
 }
