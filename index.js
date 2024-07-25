@@ -291,11 +291,14 @@ async function endHand() {
     }
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
-    dealerSecondCardImg.classList.remove("imgSlide");
     let imgPath = `./assets/cards-1.3/${dealersHand[1].image}`;
 
-    await delay(animationDelay);
-    flipCard(dealerSecondCardImg, imgPath);
+    await delay(animationDelay / 2);
+
+    await preloadImage(imgPath);
+    dealerSecondCardImg.src = imgPath;
+    // Animate the card flip
+    animateElement(dealerSecondCardImg, "imgFlip", flipDelay);
 
     updateHeaders("endGame");
 
@@ -370,6 +373,7 @@ function displayWinner() {
 
 // ############# Card Management and Display #############
 
+// Add a card to the specified hand and update UI
 async function addCard(cards, div, entity) {
   const card = deck.getCard();
   cards.push(card);
@@ -377,39 +381,47 @@ async function addCard(cards, div, entity) {
   let imgPath = "./assets/cards-1.3/back.png";
   let img = document.createElement("img");
 
-  // Preload the image
-  let preloadImg = new Image();
-  preloadImg.src = imgPath;
-  preloadImg.onload = () => {
-    img.src = imgPath;
-    div.appendChild(img);
+  // Preload the back image
+  await preloadImage(imgPath);
+  img.src = imgPath;
+  div.appendChild(img);
 
-    requestAnimationFrame(async () => {
-      img.classList.add("imgSlide");
-      await delay(slideDelay);
-      img.classList.remove("imgSlide");
+  // Animate the card slide-in
+  await animateElement(img, "imgSlide", slideDelay);
 
-      if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
-        let finalImgPath = `./assets/cards-1.3/${card.image}`;
-        preloadImg = new Image();
-        preloadImg.src = finalImgPath;
-        preloadImg.onload = () => {
-          img.src = finalImgPath;
-          flipCard(img);
-        };
-      }
+  // Update the card image if necessary
+  if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
+    let finalImgPath = `./assets/cards-1.3/${card.image}`;
+    await preloadImage(finalImgPath);
+    img.src = finalImgPath;
 
-      await updateHandTotals();
-    });
-  };
+    // Animate the card flip
+    animateElement(img, "imgFlip", flipDelay);
+  }
+
+  await updateHandTotals();
 }
 
-// Flip the card image to reveal its face
-function flipCard(cardImg) {
-  requestAnimationFrame(async () => {
-    cardImg.classList.add("imgFlip");
-    await delay(flipDelay);
-    cardImg.classList.remove("imgFlip");
+// Preload an image
+function preloadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = resolve;
+  });
+}
+
+// Animate the card with a given class and delay
+function animateElement(element, animationClass, delayTime) {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      element.classList.add(animationClass);
+    });
+    requestAnimationFrame(async () => {
+      await delay(delayTime);
+      element.classList.remove(animationClass);
+      resolve();
+    });
   });
 }
 
@@ -419,7 +431,7 @@ function createAndAppendCardImages(handIndex) {
     let imgPath = `./assets/cards-1.3/${card.image}`;
     let img = document.createElement("img");
     img.src = imgPath;
-    img.classList.add("img-fluid", "imgSlide");
+    animateElement(img, "imgSlide", slideDelay);
     playerHandElements[handIndex].appendChild(img);
   });
 }
@@ -496,24 +508,22 @@ function updatePoints() {
 function addChipValue(event) {
   logGameState("Adding chip value");
   removeChipEventListeners();
-  requestAnimationFrame(async () => {
-    wagerDisplay.classList.add("highlight");
-    event.target.classList.add("chipFlip");
 
-    let chipValue = parseInt(event.target.dataset.value);
-    let newWager = currentWager[currentPlayerHand] + chipValue;
-    if (newWager <= playerPoints && Number.isInteger(newWager)) {
-      currentWager[currentPlayerHand] = newWager;
-    } else if (newWager > playerPoints) {
-      alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
-      currentWager[currentPlayerHand] = playerPoints;
-    }
-    updatePoints();
-    await delay(flipDelay);
-    event.target.classList.remove("chipFlip");
-    setupChipEventListeners();
-    wagerDisplay.classList.remove("highlight");
-  });
+  animateElement(wagerDisplay, "highlight", flipDelay);
+  animateElement(event.target, "chipFlip", flipDelay);
+
+  let chipValue = parseInt(event.target.dataset.value);
+  let newWager = currentWager[currentPlayerHand] + chipValue;
+
+  if (newWager <= playerPoints && Number.isInteger(newWager)) {
+    currentWager[currentPlayerHand] = newWager;
+  } else if (newWager > playerPoints) {
+    alert("Oops! You don't have enough points to place that wager. Your wager has been adjusted to your remaining points.");
+    currentWager[currentPlayerHand] = playerPoints;
+  }
+
+  updatePoints();
+  setupChipEventListeners();
 }
 
 // Place the wager and start the initial deal
