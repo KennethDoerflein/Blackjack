@@ -370,48 +370,47 @@ function displayWinner() {
 
 // ############# Card Management and Display #############
 
-// Add a card to the specified hand and update UI
-function addCard(cards, div, entity) {
+async function addCard(cards, div, entity) {
   const card = deck.getCard();
   cards.push(card);
 
   let imgPath = "./assets/cards-1.3/back.png";
   let img = document.createElement("img");
-  img.src = imgPath;
-  img.classList.add("img-fluid");
 
-  return new Promise((resolve) => {
-    img.onload = async () => {
-      div.appendChild(img);
-      requestAnimationFrame(() => {
-        img.classList.add("imgSlide");
-        requestAnimationFrame(async () => {
-          if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
-            let finalImgPath = `./assets/cards-1.3/${card.image}`;
-            await delay(slideDelay);
-            img.classList.remove("imgSlide");
-            img.src = finalImgPath;
-            img.onload = () => {
-              flipCard(img, finalImgPath);
-            };
-          }
-          await updateHandTotals();
-          resolve();
-        });
-      });
-    };
-  });
+  // Preload the image
+  let preloadImg = new Image();
+  preloadImg.src = imgPath;
+  preloadImg.onload = () => {
+    img.src = imgPath;
+    div.appendChild(img);
+
+    requestAnimationFrame(async () => {
+      img.classList.add("imgSlide");
+      await delay(slideDelay);
+      img.classList.remove("imgSlide");
+
+      if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
+        let finalImgPath = `./assets/cards-1.3/${card.image}`;
+        preloadImg = new Image();
+        preloadImg.src = finalImgPath;
+        preloadImg.onload = () => {
+          img.src = finalImgPath;
+          flipCard(img);
+        };
+      }
+
+      await updateHandTotals();
+    });
+  };
 }
 
 // Flip the card image to reveal its face
-function flipCard(cardImg, imgPath) {
-  cardImg.classList.remove("imgSlide");
-  cardImg.src = imgPath;
-  cardImg.onload = () => {
-    requestAnimationFrame(() => {
-      cardImg.classList.add("imgFlip");
-    });
-  };
+function flipCard(cardImg) {
+  requestAnimationFrame(async () => {
+    cardImg.classList.add("imgFlip");
+    await delay(flipDelay);
+    cardImg.classList.remove("imgFlip");
+  });
 }
 
 // Create and append card images to the player's hand
