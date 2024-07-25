@@ -192,6 +192,7 @@ async function hit(entity = "player", origin = "user") {
   logGameState(`Hit: ${entity}, Origin: ${origin}`);
 
   hitBtn.removeEventListener("click", hit);
+  disableGameButtons();
 
   await updateHeaders();
 
@@ -214,6 +215,7 @@ async function hit(entity = "player", origin = "user") {
 
   await delay(animationDelay);
   hitBtn.addEventListener("click", hit);
+  enableGameButtons();
 }
 
 // Handle the player doubling down their wager
