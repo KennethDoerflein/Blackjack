@@ -7,17 +7,24 @@
 }
 
 #hitBtn {
-  padding: 4px 16.5px 4px 16.5px;
-  font-weight: bold;
+  padding: 4px 21.5px 4px 21.5px;
 }
 
 #splitBtn {
-  padding: 4px 11.5px 4px 11.5px;
-  font-weight: bold;
+  padding: 4px 16.5px 4px 16.5px;
 }
 
 #standBtn {
+  padding: 4px 13px 4px 13px;
+}
+
+#doubleDownBtn {
+  line-height: 0.9;
+}
+
+#gameActions button {
   font-weight: bold;
+  border-radius: 10px;
 }
 
 #dealersHand,
@@ -74,6 +81,7 @@
 #allInBtn {
   max-width: 120px;
   font-size: 12px;
+  border-radius: 10px;
 }
 
 #wagerDiv #allInBtn {
@@ -90,8 +98,8 @@
 }
 
 .activeHand {
-  border: 3px solid yellow;
-  box-shadow: 0 0 8px yellow;
+  border: 5px solid yellow;
+  box-shadow: 0 0 15px yellow;
 }
 
 @keyframes slideIn {
@@ -105,10 +113,10 @@
 
 @keyframes flip {
   from {
-    transform: rotateY(90deg);
+    transform: rotateX(20deg) rotateY(90deg);
   }
   to {
-    transform: rotateY(0deg);
+    transform: rotateX(0deg) rotateY(0deg);
   }
 }
 
@@ -122,10 +130,10 @@
 
 @keyframes flipFull {
   from {
-    transform: rotateY(360deg);
+    transform: rotateX(180deg) rotateY(360deg);
   }
   to {
-    transform: rotateY(0deg);
+    transform: rotateX(0deg) rotateY(0deg);
   }
 }
 
@@ -133,6 +141,7 @@
   animation: flipFull 0.7s linear;
   transform-style: preserve-3d;
 }
+
 @keyframes highlight {
   0% {
     background-color: #ccc;

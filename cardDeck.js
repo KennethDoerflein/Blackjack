@@ -16,8 +16,9 @@ class CardDeck {
 
     this.cards = this.createDeck();
     this.dealtCards = [];
-    this.preloadImages();
-    this.shuffle();
+    this.preloadImages().then(() => {
+      this.shuffle();
+    });
   }
 
   createDeck() {
@@ -36,10 +37,15 @@ class CardDeck {
   preloadImages() {
     let images = this.cards.map((card) => `./assets/cards-1.3/${card.image}`);
 
-    images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
+    let promises = images.map((src) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = resolve;
+      });
     });
+
+    return Promise.all(promises);
   }
 
   shuffle() {

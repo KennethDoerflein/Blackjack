@@ -48,10 +48,13 @@
           </div>
         </div>
 
-        <button hidden id="hitBtn" type="button" class="btn-sm btn btn-warning mt-2 me-5">Hit</button>
-        <button hidden id="splitBtn" type="button" class="btn-sm btn btn-primary mt-2">Split</button>
-        <button hidden id="standBtn" type="button" class="btn-sm btn btn-danger mt-2 ms-5">Stand</button>
-        <button hidden id="newGameBtn" type="button" class="btn-sm btn btn-success mt-2">Start Game</button>
+        <div id="gameActions" class="d-flex justify-content-center w-100 mt-2">
+          <button hidden id="hitBtn" type="button" class="btn-sm btn btn-warning mx-2">Hit</button>
+          <button hidden id="splitBtn" type="button" class="btn-sm btn btn-primary mx-2">Split</button>
+          <button hidden id="doubleDownBtn" type="button" class="btn-sm btn btn-light mx-2">Double<br />Down</button>
+          <button hidden id="standBtn" type="button" class="btn-sm btn btn-danger mx-2">Stand</button>
+          <button hidden id="newGameBtn" type="button" class="btn-sm btn btn-success mx-2">Start Game</button>
+        </div>
       </div>
 
       <div id="disclaimer" class="container text-center mt-3">
@@ -71,21 +74,96 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <div class="text-center mb-3 text-muted text-decoration-underline">
+              <small>Some Switches Will Be Disabled During a Game</small>
+            </div>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="musicSwitch" />
               <label class="form-check-label" for="musicSwitch">Music</label>
             </div>
             <div class="form-check form-switch">
               <input checked class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
-              <label class="form-check-label" for="standSwitch">Automatically stand on 21</label>
+              <label class="form-check-label" for="standSwitch">Automatically Stand When You Get 21</label>
             </div>
             <div class="form-check form-switch">
               <input checked class="form-check-input" type="checkbox" role="switch" id="soft17Switch" />
-              <label class="form-check-label" for="soft17Switch">Dealer hits on Soft 17</label>
+              <label class="form-check-label" for="soft17Switch">Dealer Hits on Soft 17</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="splitSwitch" />
+              <label class="form-check-label" for="splitSwitch">Split Based on Suit</label>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="mx-auto btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="px-1 py-1 btn btn-sm btn-dark position-absolute top-0 start-0" data-bs-toggle="modal" data-bs-target="#infoModal">ℹ️</button>
+
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title mx-auto fw-bolder" id="infoModalLabel">Game Rules and Button Explanations</h5>
+          </div>
+          <div class="modal-body bg-light text-dark">
+            <p class="modal-title text-center fw-bolder"><u>Disclaimer</u></p>
+            <p>By visiting this site or playing this game, you acknowledge that:</p>
+            <ul>
+              <li>
+                The points earned in this game are purely fictional, have no monetary value, and are for entertainment purposes only. They cannot be exchanged for any goods or
+                services.
+              </li>
+              <li>This game does not promote any form of gambling.</li>
+              <li>The game is intended for users who are 18 years of age or older.</li>
+              <li>Users should play responsibly and ensure that playing does not interfere with their daily responsibilities.</li>
+              <li>The game rules are subject to change, so users should check the rules regularly.</li>
+              <li>By bypassing this agreement, you accept and agree to abide by these terms.</li>
+            </ul>
+
+            <hr />
+
+            <p class="modal-title text-center fw-bolder"><u>Blackjack Rules</u></p>
+            <ol>
+              <li>The goal of blackjack is to beat the dealer's hand without going over 21.</li>
+              <li>Face cards are worth 10. Aces are worth 1 or 11, whichever makes a better hand.</li>
+              <li>Each player starts with two cards; one of the dealer's cards is hidden until the end.</li>
+              <li>To 'Hit' is to ask for another card. To 'Stand' is to hold your total and end your turn.</li>
+              <li>If you go over 21, you bust, and the dealer wins regardless of the dealer's hand.</li>
+              <li>If you are dealt an Ace and a 10 (or a face card), you have blackjack.</li>
+              <li>
+                The dealer will hit until their cards total 17 or higher. If the `soft17Switch` is checked, the dealer will also hit on a soft 17 (a hand totaling 17 with an
+                Ace counted as 11).
+              </li>
+            </ol>
+
+            <hr />
+
+            <p class="modal-title text-center fw-bolder"><u>Button Explanations</u></p>
+            <ul>
+              <li><strong>Hit Button</strong>: Request another card from the dealer.</li>
+              <li>
+                <strong>Split Button</strong>: Split two cards of the same value into two separate hands, doubling your wager. Splitting is allowed if the game is in progress,
+                you haven't already split three times, the two cards have the same point value, and you have enough points for the wager.
+              </li>
+              <li>
+                <strong>Double Down Button</strong>: Double your initial wager and receive one more card. This is typically used when the odds are in your favor. Doubling down
+                is allowed if the game is in progress, your hand has exactly two cards, the total of the hand is 21 or less, and you have enough points for the wager.
+              </li>
+              <li>
+                <strong>Stand Button</strong>: Choose not to take any more cards and pass to the next hand or dealer. If the `standSwitch` is checked and your total is 21, the
+                game will automatically move to the dealer's turn or next hand.
+              </li>
+              <li><strong>Start/New Game Button</strong>: Starts a new game.</li>
+              <li><strong>Music Toggle</strong>: Enables or disables the game music (disabled by default).</li>
+            </ul>
+          </div>
+
+          <div class="modal-footer bg-primary">
+            <button type="button" class="mx-auto btn btn-warning" data-bs-dismiss="modal">I Acknowledge and Accept</button>
           </div>
         </div>
       </div>
