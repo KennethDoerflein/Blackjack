@@ -37,7 +37,7 @@
   max-height: 18vh !important;
   min-height: 18vh !important;
   height: 18vh !important;
-  max-width: 50rem;
+  max-width: 90vh;
   background-color: rgb(9, 59, 9);
 }
 
@@ -57,8 +57,9 @@
 
 #pointsDisplay,
 #wagerDisplay {
-  max-height: 3.7vh !important;
-  height: 3.7vh !important;
+  max-height: 4vh !important;
+  height: 4vh !important;
+  width: 20vh;
   font-size: 1.2vh;
   font-weight: bold;
 }
