@@ -1,7 +1,7 @@
 // ############# Global Variables and Constants #############
 
 // Debug mode variable
-const debugMode = false; // Set to false to disable logging
+const debugMode = false; // Set to true to enable logging
 
 // DOM Elements
 const hitBtn = document.getElementById("hitBtn");
@@ -25,6 +25,7 @@ const backgroundMusic = document.getElementById("backgroundMusic");
 const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
+const splitSwitch = document.getElementById("splitSwitch");
 
 // Game Variables
 const deck = new CardDeck();
@@ -80,6 +81,7 @@ function initializeGame() {
     setupEventListeners();
     updatePoints();
     toggleWagerElements();
+    enableSettingsButtons();
     newGameBtn.textContent = "New Game";
     let message = document.createElement("h6");
     message.textContent = "Place your wager to begin!";
@@ -120,6 +122,8 @@ function setupEventListeners() {
   allInBtn.addEventListener("click", placeWager);
   wagerRst.addEventListener("click", clearWager);
   musicSwitch.addEventListener("click", toggleMusic);
+  splitSwitch.addEventListener("click", checkSplitButton);
+
   setupChipEventListeners();
 }
 
@@ -134,6 +138,8 @@ function removeEventListeners() {
   allInBtn.removeEventListener("click", placeWager);
   wagerRst.removeEventListener("click", clearWager);
   musicSwitch.removeEventListener("click", toggleMusic);
+  splitSwitch.removeEventListener("click", checkSplitButton);
+
   removeChipEventListeners();
 }
 
@@ -482,6 +488,11 @@ function isSoft17(cards) {
   return totalWithoutAces === 6 && numAces > 0;
 }
 
+// Check if the split button should be shown based on split switch (point value or rank)
+function checkSplitButton() {
+  splitBtn.hidden = !hitBtn.hidden && isSplitAllowed() ? false : true;
+}
+
 // Calculate total points for a hand, excluding reduction of Aces to 1
 function calculateTotalWithoutAces(cards) {
   let total = 0;
@@ -542,6 +553,7 @@ function placeWager(event) {
     } else {
       playerPoints -= currentWager[currentPlayerHand];
     }
+    disableSettingsButtons();
     updatePoints();
     toggleWagerElements();
     initialDeal();
@@ -633,12 +645,11 @@ function shouldDealerHit(total, hand) {
 
 // Check if splitting is allowed based on current hand and rules
 function isSplitAllowed() {
-  return (
-    splitCount < 3 &&
-    playersHand[currentPlayerHand].length === 2 &&
-    playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue &&
-    isWagerAllowed()
-  );
+  const isMatchingRankOrValue = splitSwitch.checked
+    ? playersHand[currentPlayerHand][0].rank === playersHand[currentPlayerHand][1].rank
+    : playersHand[currentPlayerHand][0].pointValue === playersHand[currentPlayerHand][1].pointValue;
+
+  return splitCount < 3 && playersHand[currentPlayerHand].length === 2 && isMatchingRankOrValue && isWagerAllowed();
 }
 
 // Check if doubling down is allowed based on current hand and rules
@@ -678,4 +689,16 @@ function disableGameButtons() {
   standBtn.disabled = true;
   splitBtn.disabled = true;
   doubleDownBtn.disabled = true;
+}
+
+// Enable settings buttons
+function enableSettingsButtons() {
+  splitSwitch.disabled = false;
+  soft17Switch.disabled = false;
+}
+
+// Disable settings buttons
+function disableSettingsButtons() {
+  splitSwitch.disabled = true;
+  soft17Switch.disabled = true;
 }

@@ -74,17 +74,24 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <div class="text-center mb-3 text-muted text-decoration-underline">
+              <small>Some Switches Will Be Disabled During a Game</small>
+            </div>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="musicSwitch" />
               <label class="form-check-label" for="musicSwitch">Music</label>
             </div>
             <div class="form-check form-switch">
               <input checked class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
-              <label class="form-check-label" for="standSwitch">Automatically stand when you get 21</label>
+              <label class="form-check-label" for="standSwitch">Automatically Stand When You Get 21</label>
             </div>
             <div class="form-check form-switch">
               <input checked class="form-check-input" type="checkbox" role="switch" id="soft17Switch" />
-              <label class="form-check-label" for="soft17Switch">Dealer hits on Soft 17</label>
+              <label class="form-check-label" for="soft17Switch">Dealer Hits on Soft 17</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="splitSwitch" />
+              <label class="form-check-label" for="splitSwitch">Split Based on Suit</label>
             </div>
           </div>
           <div class="modal-footer">
@@ -103,7 +110,6 @@
             <h5 class="modal-title mx-auto fw-bolder" id="infoModalLabel">Game Rules and Button Explanations</h5>
           </div>
           <div class="modal-body bg-light text-dark">
-            
             <p class="modal-title text-center fw-bolder"><u>Disclaimer</u></p>
             <p>By visiting this site or playing this game, you acknowledge that:</p>
             <ul>
