@@ -1,8 +1,8 @@
 #dealersHand img,
 #playersHands > div img {
   max-height: 100% !important;
-  margin-right: calc(-3vh);
-  margin-left: calc(-3vh);
+  margin-right: -3vh;
+  margin-left: -3vh;
   transform-style: preserve-3d;
 }
 
@@ -31,7 +31,7 @@
   border: 1px solid #ccc;
   padding: 1.4vh;
   margin-bottom: 15px;
-  padding-left: calc(4.5vh);
+  padding-left: 4.5vh;
   border-radius: 5px;
   max-height: 18vh !important;
   min-height: 18vh !important;
