@@ -1,8 +1,8 @@
 #dealersHand img,
 #playersHands > div img {
   max-height: 100% !important;
-  margin-right: calc(-4vh);
-  margin-left: calc(-4vh);
+  margin-right: calc(-3vh);
+  margin-left: calc(-3vh);
   transform-style: preserve-3d;
 }
 
@@ -23,16 +23,15 @@
 }
 
 #gameActions button {
-  font-weight: bold;
   border-radius: 10px;
 }
 
 #dealersHand,
 #playersHands > div {
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 1.4vh;
   margin-bottom: 15px;
-  padding-left: calc(5.6vh);
+  padding-left: calc(4.5vh);
   border-radius: 5px;
   max-height: 18vh !important;
   min-height: 18vh !important;
