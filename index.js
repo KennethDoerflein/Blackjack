@@ -814,8 +814,9 @@ function pinchMove() {
   }
 }
 
-function pinchEnd() {
+async function pinchEnd() {
   scaling = false;
+  await delay(200);
   handleResize();
 }
 
