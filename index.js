@@ -796,3 +796,27 @@ document.addEventListener(
   },
   false
 );
+
+let initialDistance = 0;
+let scaling = false;
+
+function pinchStart(e) {
+  if (e.touches.length === 2) {
+    scaling = true;
+    initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+  }
+}
+
+function pinchMove(e) {
+  if (scaling) {
+    handleResize();
+  }
+}
+
+function pinchEnd(e) {
+  scaling = false;
+}
+
+document.addEventListener("touchstart", pinchStart, false);
+document.addEventListener("touchmove", pinchMove, false);
+document.addEventListener("touchend", pinchEnd, false);
