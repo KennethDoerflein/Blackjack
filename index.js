@@ -436,7 +436,7 @@ function adjustCardMargins(cards, div, imgElement, viewportWidth) {
     marginLeftVw = -((totalCardsWidthVw - maxTotalCardsWidthVw) / (cardCount - 1));
     const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
     if (imgElement !== null) {
-      if (finalMargin <= 0) {
+      if (finalMargin <= 0 && finalMargin >= imgWidthVw * -overlapFactor) {
         imgElement.style.marginLeft = `${finalMargin}vw`;
       }
     }
@@ -445,7 +445,7 @@ function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   images.forEach((img, index) => {
     if (index !== 0) {
       const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
-      if (finalMargin <= 0) {
+      if (finalMargin <= 0 && finalMargin >= imgWidthVw * -overlapFactor) {
         img.style.marginLeft = `${finalMargin}vw`;
       }
     }
@@ -668,13 +668,11 @@ let lastWidth = window.innerWidth;
 let lastHeight = window.innerHeight;
 function handleResize() {
   if (dealerTotal > 0) {
-    if ((window.innerWidth > window.innerHeight && lastWidth <= lastHeight) || (window.innerWidth < window.innerHeight && lastWidth >= lastHeight)) {
-      const viewportWidth = window.innerWidth * 0.85;
-      for (let i = 0; i < playerHandElements.length; i++) {
-        adjustCardMargins(playersHand[0], playerHandElements[0], null, viewportWidth);
-      }
-      adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
+    const viewportWidth = window.innerWidth * 0.85;
+    for (let i = 0; i < playerHandElements.length; i++) {
+      adjustCardMargins(playersHand[0], playerHandElements[0], null, viewportWidth);
     }
+    adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
   }
   lastWidth = window.innerWidth;
   lastHeight = window.innerHeight;
