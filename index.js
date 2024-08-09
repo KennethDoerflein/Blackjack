@@ -681,7 +681,9 @@ function handleResize() {
   if (dealerTotal > 0) {
     const viewportWidth = window.innerWidth * 0.85;
     for (let i = 0; i < playerHandElements.length; i++) {
-      adjustCardMargins(playersHand[0], playerHandElements[0], null, viewportWidth);
+      if (playersHand[i].length > 0) {
+        adjustCardMargins(playersHand[i], playerHandElements[i], null, viewportWidth);
+      }
     }
     adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
   }
