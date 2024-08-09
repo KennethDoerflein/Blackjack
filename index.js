@@ -784,6 +784,8 @@ function disableSettingsButtons() {
   soft17Switch.disabled = true;
 }
 
+// ############# Touchscreen Specific Listeners #############
+
 let lastTouchEnd = 0;
 document.addEventListener(
   "touchend",
@@ -797,23 +799,22 @@ document.addEventListener(
   false
 );
 
-let initialDistance = 0;
+// ### Zoom in/out Detection
 let scaling = false;
 
 function pinchStart(e) {
   if (e.touches.length === 2) {
     scaling = true;
-    initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
   }
 }
 
-function pinchMove(e) {
+function pinchMove() {
   if (scaling) {
     handleResize();
   }
 }
 
-function pinchEnd(e) {
+function pinchEnd() {
   scaling = false;
 }
 
