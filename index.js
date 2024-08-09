@@ -793,7 +793,7 @@ document.addEventListener(
   "touchend",
   function (event) {
     let now = new Date().getTime();
-    if (now - lastTouchEnd <= 300) {
+    if (now - lastTouchEnd <= 500) {
       event.preventDefault();
     }
     lastTouchEnd = now;
@@ -818,7 +818,7 @@ function pinchMove() {
 
 async function pinchEnd() {
   scaling = false;
-  await delay(200);
+  await delay(500);
   handleResize();
 }
 
