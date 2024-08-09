@@ -21,13 +21,14 @@
       <div id="message" class="container mb-4 text-center position-relative"></div>
       <h6 id="dealerHeader" class="container text-center">Dealer's Cards</h6>
       <div id="dealersHand" class="container"></div>
+
       <h6 id="playerHeader" class="container text-center">Player's Cards</h6>
-      <div id="playersHands" class="mx-auto">
+      <span id="playersHands" class="">
         <div id="playersHand" class="container"></div>
         <div hidden id="playersSecondHand" class="container"></div>
         <div hidden id="playersThirdHand" class="container"></div>
         <div hidden id="playersFourthHand" class="container"></div>
-      </div>
+      </span>
 
       <div class="container mt-2 d-flex justify-content-center">
         <div id="pointsDisplay" class="text-center me-3 mb-2 px-4 border rounded d-flex align-items-center justify-content-center">Points*: ----</div>
@@ -82,7 +83,7 @@
               <label class="form-check-label" for="musicSwitch">Music</label>
             </div>
             <div class="form-check form-switch">
-              <input checked class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
+              <input class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
               <label class="form-check-label" for="standSwitch">Automatically Stand When You Get 21</label>
             </div>
             <div class="form-check form-switch">

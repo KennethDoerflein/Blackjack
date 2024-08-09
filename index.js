@@ -383,31 +383,84 @@ function displayWinner() {
 
 // Add a card to the specified hand and update UI
 async function addCard(cards, div, entity) {
+  const viewportWidth = window.innerWidth * 0.85;
+
   const card = deck.getCard();
   cards.push(card);
 
-  let imgPath = "./assets/cards-1.3/back.png";
-  let img = document.createElement("img");
+  const imgElement = await createCardImage("./assets/cards-1.3/back.png");
 
-  // Preload the back image
-  await preloadImage(imgPath);
-  img.src = imgPath;
-  div.appendChild(img);
+  if (cards.length > 2) {
+    adjustCardMargins(cards, div, imgElement, viewportWidth);
+  }
 
-  // Animate the card slide-in
-  await animateElement(img, "imgSlide", slideDelay);
+  div.appendChild(imgElement);
 
-  // Update the card image if necessary
-  if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
-    let finalImgPath = `./assets/cards-1.3/${card.image}`;
-    await preloadImage(finalImgPath);
-    img.src = finalImgPath;
+  await animateElement(imgElement, "imgSlide", slideDelay);
 
-    // Animate the card flip
-    animateElement(img, "imgFlip", flipDelay);
+  if (shouldFlipCard(entity, cards)) {
+    const finalImgPath = `./assets/cards-1.3/${card.image}`;
+    imgElement.src = await preloadAndGetImage(finalImgPath);
+    animateElement(imgElement, "imgFlip", flipDelay);
   }
 
   await updateHandTotals();
+}
+
+// create an HTML image element
+async function createCardImage(initialSrc) {
+  await preloadImage(initialSrc);
+  const imgElement = document.createElement("img");
+  imgElement.src = initialSrc;
+  return imgElement;
+}
+
+// Calculate and adjust card margins to avoid overflow
+function adjustCardMargins(cards, div, imgElement, viewportWidth) {
+  const images = div.querySelectorAll("img");
+  const cardCount = cards.length;
+
+  // Calculate image width and available space
+  const imgWidthPx = images[0].offsetWidth;
+  const imgWidthVw = (imgWidthPx / viewportWidth) * 100 + 2;
+  const overlapFactor = window.innerHeight > window.innerWidth ? 0.8 : 0.6;
+  const maxImageOffsetVw = -overlapFactor * imgWidthVw;
+
+  // Calculate total space needed for all cards
+  const totalCardsWidthVw = imgWidthVw * cardCount - 2;
+  const maxTotalCardsWidthVw = 85;
+
+  // Calculate margin between cards
+  let marginLeftVw = 0;
+  if (totalCardsWidthVw > maxTotalCardsWidthVw) {
+    marginLeftVw = -((totalCardsWidthVw - maxTotalCardsWidthVw) / (cardCount - 1));
+    const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
+    if (imgElement !== null) {
+      if (finalMargin <= 0) {
+        imgElement.style.marginLeft = `${finalMargin}vw`;
+      }
+    }
+  }
+
+  images.forEach((img, index) => {
+    if (index !== 0) {
+      const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
+      if (finalMargin <= 0) {
+        img.style.marginLeft = `${finalMargin}vw`;
+      }
+    }
+  });
+}
+
+// Check if a card should be face up
+function shouldFlipCard(entity, cards) {
+  return entity !== "dealer" || cards.length !== 2;
+}
+
+// Preload an image and return its src
+async function preloadAndGetImage(src) {
+  await preloadImage(src);
+  return src;
 }
 
 // Preload an image
@@ -611,6 +664,25 @@ function clearDiv(div) {
   }
 }
 
+let lastWidth = window.innerWidth;
+let lastHeight = window.innerHeight;
+function handleResize() {
+  if (dealerTotal > 0) {
+    if ((window.innerWidth > window.innerHeight && lastWidth <= lastHeight) || (window.innerWidth < window.innerHeight && lastWidth >= lastHeight)) {
+      const viewportWidth = window.innerWidth * 0.85;
+      for (let i = 0; i < playerHandElements.length; i++) {
+        adjustCardMargins(playersHand[0], playerHandElements[0], null, viewportWidth);
+      }
+      adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
+    }
+  }
+  lastWidth = window.innerWidth;
+  lastHeight = window.innerHeight;
+}
+
+// Add event listener for resize
+window.addEventListener("resize", handleResize);
+
 // ############# Utilities and Debugging #############
 
 // Create a delay in milliseconds
@@ -702,3 +774,16 @@ function disableSettingsButtons() {
   splitSwitch.disabled = true;
   soft17Switch.disabled = true;
 }
+
+let lastTouchEnd = 0;
+document.addEventListener(
+  "touchend",
+  function (event) {
+    let now = new Date().getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  },
+  false
+);
