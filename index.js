@@ -423,30 +423,41 @@ function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   // Calculate image width and available space
   const imgWidthPx = images[0].offsetWidth;
   const imgWidthVw = (imgWidthPx / viewportWidth) * 100 + 2;
-  const overlapFactor = window.innerHeight > window.innerWidth ? 0.8 : 0.6;
-  const maxImageOffsetVw = -overlapFactor * imgWidthVw;
-
+  const overlapFactor = window.innerHeight > window.innerWidth ? 1 : 0.75;
+  // const maxImageOffsetVw = -overlapFactor * imgWidthVw;
+  const maxImageOffsetPx = -overlapFactor * imgWidthPx;
   // Calculate total space needed for all cards
   const totalCardsWidthVw = imgWidthVw * cardCount - 2;
+  // const totalCardsWidthPx = imgWidthPx * cardCount + (cardCount - 1) * 12;
   const maxTotalCardsWidthVw = 85;
 
   // Calculate margin between cards
   let marginLeftVw = 0;
+  let marginLeftPx = 0;
+  // console.log("totalCardsWidthVw: " + totalCardsWidthVw);
+  // console.log("maxTotalCardsWidthVw: " + maxTotalCardsWidthVw);
+
   if (totalCardsWidthVw > maxTotalCardsWidthVw) {
     marginLeftVw = -((totalCardsWidthVw - maxTotalCardsWidthVw) / (cardCount - 1));
-    const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
+    marginLeftPx = (marginLeftVw / maxTotalCardsWidthVw) * viewportWidth;
+
+    // const finalMarginVw = Math.max(marginLeftVw, maxImageOffsetVw);
+    const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
+
     if (imgElement !== null) {
-      if (finalMargin <= 0 && finalMargin >= imgWidthVw * -overlapFactor) {
-        imgElement.style.marginLeft = `${finalMargin}vw`;
+      if (finalMarginPx <= 0) {
+        console.log("finalMarginPx: " + finalMarginPx);
+        imgElement.style.marginLeft = `${finalMarginPx}px`;
       }
     }
   }
 
   images.forEach((img, index) => {
     if (index !== 0) {
-      const finalMargin = Math.max(marginLeftVw, maxImageOffsetVw);
-      if (finalMargin <= 0 && finalMargin >= imgWidthVw * -overlapFactor) {
-        img.style.marginLeft = `${finalMargin}vw`;
+      // const finalMarginVw = Math.max(marginLeftVw, maxImageOffsetVw);
+      const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
+      if (finalMarginPx <= 0) {
+        img.style.marginLeft = `${finalMarginPx}px`;
       }
     }
   });
