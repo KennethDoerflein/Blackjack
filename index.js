@@ -816,10 +816,11 @@ function pinchMove() {
   }
 }
 
-async function pinchEnd() {
+function pinchEnd() {
   scaling = false;
-  await delay(500);
-  handleResize();
+  setTimeout(() => {
+    handleResize();
+  }, 500);
 }
 
 document.addEventListener("touchstart", pinchStart, false);
