@@ -816,8 +816,10 @@ function pinchMove() {
 
 function pinchEnd() {
   scaling = false;
+  handleResize();
 }
 
 document.addEventListener("touchstart", pinchStart, false);
 document.addEventListener("touchmove", pinchMove, false);
 document.addEventListener("touchend", pinchEnd, false);
+document.addEventListener("touchcancel", pinchEnd, false);
