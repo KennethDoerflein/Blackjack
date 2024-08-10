@@ -434,28 +434,22 @@ function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   // Calculate margin between cards
   let marginLeftVw = 0;
   let marginLeftPx = 0;
-  // console.log("totalCardsWidthVw: " + totalCardsWidthVw);
-  // console.log("maxTotalCardsWidthVw: " + maxTotalCardsWidthVw);
 
   if (totalCardsWidthVw > maxTotalCardsWidthVw) {
     marginLeftVw = -((totalCardsWidthVw - maxTotalCardsWidthVw) / (cardCount - 1));
     marginLeftPx = (marginLeftVw / maxTotalCardsWidthVw) * viewportWidth;
+  }
 
-    // const finalMarginVw = Math.max(marginLeftVw, maxImageOffsetVw);
-    const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
+  const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
 
-    if (imgElement !== null) {
-      if (finalMarginPx <= 0) {
-        console.log("finalMarginPx: " + finalMarginPx);
-        imgElement.style.marginLeft = `${finalMarginPx}px`;
-      }
+  if (imgElement !== null) {
+    if (finalMarginPx <= 0) {
+      imgElement.style.marginLeft = `${finalMarginPx}px`;
     }
   }
 
   images.forEach((img, index) => {
     if (index !== 0) {
-      // const finalMarginVw = Math.max(marginLeftVw, maxImageOffsetVw);
-      const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
       if (finalMarginPx <= 0) {
         img.style.marginLeft = `${finalMarginPx}px`;
       }
