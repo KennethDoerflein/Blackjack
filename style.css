@@ -166,6 +166,6 @@
   animation: highlight 0.5s linear;
 }
 
-img {
-  transition: margin-left 0.7s linear;
+.viewportResize {
+  transition: margin-left 0.3s linear;
 }
