@@ -402,7 +402,7 @@ async function addCard(cards, div, entity) {
   if (shouldFlipCard(entity, cards)) {
     const finalImgPath = `./assets/cards-1.3/${card.image}`;
     imgElement.src = await preloadAndGetImage(finalImgPath);
-    animateElement(imgElement, "imgFlip", flipDelay);
+    await animateElement(imgElement, "imgFlip", flipDelay);
   }
 
   await updateHandTotals();
