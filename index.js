@@ -37,6 +37,10 @@ let dealersHand, dealerTotal, playersHand, playerTotal, currentPlayerHand, split
 let playerPoints = 100;
 let currentWager = [0, 0, 0, 0];
 
+// UI variables
+let lastResize = 0;
+let lastTouchEnd = 0;
+
 // Array for player's hand elements
 const playerHandElements = [
   document.getElementById("playersHand"),
@@ -676,8 +680,15 @@ function clearDiv(div) {
 }
 
 // Adjust margins for all hands
-function handleResize() {
-  if (dealerTotal > 0) {
+async function handleResize() {
+  let now = new Date().getTime();
+  if (dealerTotal > 0 && dealersHand.length >= 2 && now - lastResize >= slideDelay) {
+    const images = document.querySelectorAll("img");
+
+    images.forEach((image) => {
+      image.classList.add("viewportResize");
+    });
+
     const viewportWidth = window.innerWidth * 0.85;
     for (let i = 0; i < playerHandElements.length; i++) {
       if (playersHand[i].length > 0) {
@@ -685,7 +696,12 @@ function handleResize() {
       }
     }
     adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
+    await delay(slideDelay);
+    images.forEach((image) => {
+      image.classList.remove("viewportResize");
+    });
   }
+  lastResize = now;
 }
 
 // Add event listener for resize
@@ -785,7 +801,6 @@ function disableSettingsButtons() {
 
 // ############# Touchscreen Specific Listeners #############
 
-let lastTouchEnd = 0;
 document.addEventListener(
   "touchend",
   function (event) {
