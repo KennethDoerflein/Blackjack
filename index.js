@@ -30,8 +30,9 @@ const splitSwitch = document.getElementById("splitSwitch");
 
 // Game Variables
 const deck = new CardDeck();
-const flipDelay = 700;
-const slideDelay = 300;
+const flipDelay = 700 / 2;
+const slideDelay = 300 + 50;
+const chipDelay = 700;
 const animationDelay = slideDelay + flipDelay;
 let dealersHand, dealerTotal, playersHand, playerTotal, currentPlayerHand, splitCount, previousPlayerHand;
 let playerPoints = 100;
@@ -82,8 +83,6 @@ function initializeGame() {
 
     resetGameVariables();
     clearGameBoard();
-    removeEventListeners();
-    setupEventListeners();
     updatePoints();
     toggleWagerElements();
     enableSettingsButtons();
@@ -202,7 +201,6 @@ function newGame() {
 async function hit(entity = "player", origin = "user") {
   logGameState(`Hit: ${entity}, Origin: ${origin}`);
 
-  hitBtn.removeEventListener("click", hit);
   disableGameButtons();
 
   await updateHeaders();
@@ -225,7 +223,6 @@ async function hit(entity = "player", origin = "user") {
   }
 
   await delay(animationDelay);
-  hitBtn.addEventListener("click", hit);
   enableGameButtons();
 }
 
@@ -296,8 +293,6 @@ async function endHand() {
     messageDiv.appendChild(message);
 
     hideGameButtons();
-    hitBtn.removeEventListener("click", hit);
-    standBtn.removeEventListener("click", endHand);
 
     if (splitCount > 0) {
       playerHandElements[currentPlayerHand].classList.remove("activeHand");
@@ -306,7 +301,7 @@ async function endHand() {
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     let imgPath = `./assets/cards-1.3/${dealersHand[1].image}`;
 
-    await delay(animationDelay / 2);
+    await delay(animationDelay * 1.5);
 
     await preloadImage(imgPath);
     dealerSecondCardImg.src = imgPath;
@@ -315,7 +310,7 @@ async function endHand() {
 
     updateHeaders("endGame");
 
-    if (shouldDealerHit(dealerTotal, dealersHand)) await delay(flipDelay);
+    if (shouldDealerHit(dealerTotal, dealersHand)) await delay(animationDelay * 1.5);
     await playDealer();
     messageDiv.removeChild(message);
     displayWinner();
@@ -579,10 +574,9 @@ function updatePoints() {
 // Add chip value to the current wager
 function addChipValue(event) {
   logGameState("Adding chip value");
-  removeChipEventListeners();
 
-  animateElement(wagerDisplay, "highlight", flipDelay);
-  animateElement(event.target, "chipFlip", flipDelay);
+  animateElement(wagerDisplay, "highlight", chipDelay);
+  animateElement(event.target, "chipFlip", chipDelay);
 
   let chipValue = parseInt(event.target.dataset.value);
   let newWager = currentWager[currentPlayerHand] + chipValue;
@@ -595,7 +589,6 @@ function addChipValue(event) {
   }
 
   updatePoints();
-  setupChipEventListeners();
 }
 
 // Place the wager and start the initial deal
