@@ -391,11 +391,11 @@ async function addCard(cards, div, entity) {
 
   const imgElement = await createCardImage("./assets/cards-1.3/back.png");
 
+  div.appendChild(imgElement);
+
   if (cards.length > 2) {
     adjustCardMargins(cards, div, imgElement, viewportWidth);
   }
-
-  div.appendChild(imgElement);
 
   await animateElement(imgElement, "imgSlide", slideDelay);
 
@@ -422,38 +422,43 @@ function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   const cardCount = cards.length;
 
   // Calculate image width and available space
-  const imgWidthPx = images[0].offsetWidth;
-  const imgWidthVw = (imgWidthPx / viewportWidth) * 100 + 2;
-  const overlapFactor = window.innerHeight > window.innerWidth ? 1 : 0.75;
-  // const maxImageOffsetVw = -overlapFactor * imgWidthVw;
-  const maxImageOffsetPx = -overlapFactor * imgWidthPx;
-  // Calculate total space needed for all cards
-  const totalCardsWidthVw = imgWidthVw * cardCount - 2;
-  // const totalCardsWidthPx = imgWidthPx * cardCount + (cardCount - 1) * 12;
-  const maxTotalCardsWidthVw = 85;
+  let allWidth = 0;
+  images.forEach((img) => {
+    const computedStyle = window.getComputedStyle(img);
+    const marginLeft = parseFloat(computedStyle.marginLeft) || 0;
+    const marginRight = parseFloat(computedStyle.marginRight) || 0;
+    allWidth += marginLeft + marginRight + img.offsetWidth;
+  });
+
+  const imgWidthPx = images[1].offsetWidth;
+  const overlapFactor = window.innerHeight > window.innerWidth ? 0.9 : 0.75;
+  const maxImageOffsetPx = -imgWidthPx * overlapFactor;
 
   // Calculate margin between cards
-  let marginLeftVw = 0;
   let marginLeftPx = 0;
 
-  if (totalCardsWidthVw > maxTotalCardsWidthVw) {
-    marginLeftVw = -((totalCardsWidthVw - maxTotalCardsWidthVw) / (cardCount - 1));
-    marginLeftPx = (marginLeftVw / maxTotalCardsWidthVw) * viewportWidth;
+  // console.log("allWidth: " + allWidth);
+  // console.log("viewportWidth: " + viewportWidth);
+  if (allWidth > viewportWidth) {
+    marginLeftPx = -(allWidth - viewportWidth) / (cardCount - 1);
+    const computedStyle = window.getComputedStyle(images[1]);
+    marginLeftPx += parseFloat(computedStyle.marginLeft) || 0;
   }
 
   const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
 
+  // console.log("marginLeftPx: " + marginLeftPx);
+  // console.log("finalMarginPx: " + finalMarginPx);
+
   if (imgElement !== null) {
-    if (finalMarginPx <= 0) {
-      imgElement.style.marginLeft = `${finalMarginPx}px`;
-    }
+    imgElement.style.marginLeft = `${finalMarginPx}px`;
+    // console.log(`imgElement marginLeft: ${imgElement.style.marginLeft}`);
   }
 
   images.forEach((img, index) => {
     if (index !== 0) {
-      if (finalMarginPx <= 0) {
-        img.style.marginLeft = `${finalMarginPx}px`;
-      }
+      img.style.marginLeft = `${finalMarginPx}px`;
+      // console.log(`Image ${index} marginLeft: ${img.style.marginLeft}`);
     }
   });
 }
@@ -820,5 +825,5 @@ function pinchEnd() {
 
 document.addEventListener("touchstart", pinchStart, false);
 document.addEventListener("touchmove", pinchMove, false);
-document.addEventListener("touchend", pinchEnd, false);
+// document.addEventListener("touchend", pinchEnd, false);
 document.addEventListener("touchcancel", pinchEnd, false);

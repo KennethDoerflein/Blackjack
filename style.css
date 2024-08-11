@@ -5,7 +5,7 @@
   justify-content: center; /* Center the hand */
   overflow-x: auto;
   border: 1px solid #ccc;
-  padding: 2vh;
+  padding: 11px;
   margin-bottom: 15px;
   border-radius: 5px;
   max-height: 18vh !important;
@@ -21,13 +21,15 @@
 #dealersHand img,
 #playersHands > div img {
   max-height: 100% !important;
-  margin-right: 2vh;
+  margin-right: 11px;
+  margin-left: 0px;
   transform-style: preserve-3d;
 }
 
 #dealersHand img:last-child,
 #playersHands > div img:last-child {
-  margin-right: 0;
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
 #hitBtn {
