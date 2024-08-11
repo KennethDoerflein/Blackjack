@@ -675,8 +675,7 @@ function clearDiv(div) {
   }
 }
 
-let lastWidth = window.innerWidth;
-let lastHeight = window.innerHeight;
+// Adjust margins for all hands
 function handleResize() {
   if (dealerTotal > 0) {
     const viewportWidth = window.innerWidth * 0.85;
@@ -687,8 +686,6 @@ function handleResize() {
     }
     adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
   }
-  lastWidth = window.innerWidth;
-  lastHeight = window.innerHeight;
 }
 
 // Add event listener for resize
