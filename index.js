@@ -1,7 +1,8 @@
 // ############# Global Variables and Constants #############
 
 // Debug mode variable
-const debugMode = false; // Set to true to enable logging
+const debugMode = false; // Set to true to disable info modal
+const verboseLogging = false; // Set to true to enable logging
 
 // DOM Elements
 const hitBtn = document.getElementById("hitBtn");
@@ -697,7 +698,7 @@ function delay(ms) {
 
 // Log the game state to the console for debugging
 function logGameState(action) {
-  if (debugMode) {
+  if (verboseLogging) {
     console.log(`[${new Date().toISOString()}] Action: ${action}`);
     console.log(`Dealers Hand: ${JSON.stringify(dealersHand)}`);
     console.log(`Players Hand: ${JSON.stringify(playersHand)}`);
