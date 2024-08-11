@@ -383,7 +383,7 @@ function displayWinner() {
 
 // Add a card to the specified hand and update UI
 async function addCard(cards, div, entity) {
-  const viewportWidth = window.innerWidth * 0.85;
+  const viewportWidth = getViewportWidth();
   const card = deck.getCard();
   cards.push(card);
 
@@ -673,7 +673,7 @@ async function handleResize() {
       image.classList.add("viewportResize");
     });
 
-    const viewportWidth = window.innerWidth * 0.85;
+    const viewportWidth = getViewportWidth();
     for (let i = 0; i < playerHandElements.length; i++) {
       if (playersHand[i].length > 0) {
         adjustCardMargins(playersHand[i], playerHandElements[i], null, viewportWidth);
@@ -686,6 +686,10 @@ async function handleResize() {
     });
   }
   lastResize = now;
+}
+
+function getViewportWidth() {
+  return window.innerWidth < 1000 ? window.innerWidth * 0.8 : window.innerWidth * 0.5;
 }
 
 // Add event listener for resize
