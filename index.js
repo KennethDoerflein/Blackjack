@@ -389,18 +389,15 @@ function displayWinner() {
 // Add a card to the specified hand and update UI
 async function addCard(cards, div, entity) {
   const viewportWidth = window.innerWidth * 0.85;
-
   const card = deck.getCard();
   cards.push(card);
 
   const imgElement = await createCardImage("./assets/cards-1.3/back.png");
 
-  div.appendChild(imgElement);
-
   if (cards.length > 2) {
     adjustCardMargins(cards, div, imgElement, viewportWidth);
   }
-
+  div.appendChild(imgElement);
   await animateElement(imgElement, "imgSlide", slideDelay);
 
   if (shouldFlipCard(entity, cards)) {
@@ -412,7 +409,7 @@ async function addCard(cards, div, entity) {
   await updateHandTotals();
 }
 
-// create an HTML image element
+// Create an HTML image element
 async function createCardImage(initialSrc) {
   await preloadImage(initialSrc);
   const imgElement = document.createElement("img");
@@ -421,50 +418,44 @@ async function createCardImage(initialSrc) {
 }
 
 // Calculate and adjust card margins to avoid overflow
-function adjustCardMargins(cards, div, imgElement, viewportWidth) {
+async function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   const images = div.querySelectorAll("img");
   const cardCount = cards.length;
-
-  // Calculate image width and available space
   let allWidth = 0;
-  images.forEach((img) => {
+
+  images.forEach((img, index) => {
     const computedStyle = window.getComputedStyle(img);
     const marginLeft = parseFloat(computedStyle.marginLeft) || 0;
     const marginRight = parseFloat(computedStyle.marginRight) || 0;
     allWidth += marginLeft + marginRight + img.offsetWidth;
+
+    // `cardCount - 3` = End element + Card not yet added + Card before the last one
+    if (index === cardCount - 3 && imgElement !== null) {
+      allWidth += marginLeft + marginRight + img.offsetWidth;
+    }
   });
 
   const imgWidthPx = images[1].offsetWidth;
   const overlapFactor = window.innerHeight > window.innerWidth ? 0.9 : 0.75;
   const maxImageOffsetPx = -imgWidthPx * overlapFactor;
-
-  // Calculate margin between cards
   let marginLeftPx = 0;
 
-  // console.log("allWidth: " + allWidth);
-  // console.log("viewportWidth: " + viewportWidth);
   if (allWidth > viewportWidth) {
     marginLeftPx = -(allWidth - viewportWidth) / (cardCount - 1);
-    const computedStyle = window.getComputedStyle(images[1]);
-    marginLeftPx += parseFloat(computedStyle.marginLeft) || 0;
+    marginLeftPx += parseFloat(window.getComputedStyle(images[1]).marginLeft) || 0;
   }
 
   const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
 
-  // console.log("marginLeftPx: " + marginLeftPx);
-  // console.log("finalMarginPx: " + finalMarginPx);
-
-  if (imgElement !== null) {
-    imgElement.style.marginLeft = `${finalMarginPx}px`;
-    // console.log(`imgElement marginLeft: ${imgElement.style.marginLeft}`);
-  }
-
   images.forEach((img, index) => {
     if (index !== 0) {
       img.style.marginLeft = `${finalMarginPx}px`;
-      // console.log(`Image ${index} marginLeft: ${img.style.marginLeft}`);
     }
   });
+
+  if (imgElement) {
+    imgElement.style.marginLeft = `${finalMarginPx}px`;
+  }
 }
 
 // Check if a card should be face up
