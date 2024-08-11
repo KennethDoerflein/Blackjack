@@ -817,6 +817,15 @@ function pinchMove() {
 }
 
 function pinchEnd() {
+  if (scaling) {
+    scaling = false;
+    setTimeout(() => {
+      handleResize();
+    }, 500);
+  }
+}
+
+function pinchCanceled() {
   scaling = false;
   setTimeout(() => {
     handleResize();
@@ -825,5 +834,5 @@ function pinchEnd() {
 
 document.addEventListener("touchstart", pinchStart, false);
 document.addEventListener("touchmove", pinchMove, false);
-// document.addEventListener("touchend", pinchEnd, false);
-document.addEventListener("touchcancel", pinchEnd, false);
+document.addEventListener("touchend", pinchEnd, false);
+document.addEventListener("touchcancel", pinchCanceled, false);
