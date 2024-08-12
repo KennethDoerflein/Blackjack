@@ -28,6 +28,9 @@ const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 const splitSwitch = document.getElementById("splitSwitch");
 const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
+const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
+  keyboard: false,
+});
 
 // Game Variables
 const deck = new CardDeck();
@@ -56,9 +59,6 @@ const playerHandElements = [
 // Start the game and show the info modal if not in debug mode
 window.onload = async () => {
   if (!debugMode) {
-    const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
-      keyboard: false,
-    });
     infoModal.show();
   }
   await delay(animationDelay);
@@ -198,12 +198,11 @@ async function hit(entity = "player", origin = "user") {
   await updateHeaders();
 
   if (entity !== "dealer") {
-    await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], entity);
+    await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], entity, origin);
   } else {
-    await addCard(dealersHand, dealersDiv, entity);
+    await addCard(dealersHand, dealersDiv, entity, origin);
   }
 
-  await updateHeaders(origin);
   if (entity !== "dealer" && origin === "user") {
     updateGameButtons();
     if (playerTotal[currentPlayerHand] > 21) {
@@ -302,7 +301,7 @@ async function endHand() {
     updateHeaders("endGame");
     if (shouldDealerHit(dealerTotal, dealersHand)) await delay(animationDelay * 1.5);
     await playDealer();
-    await delay(animationDelay * 1.5);
+    await delay(animationDelay);
     displayWinner();
   } else if (currentPlayerHand !== splitCount) {
     advanceHand();
@@ -374,7 +373,7 @@ function displayWinner() {
 // ############# Card Management and Display #############
 
 // Add a card to the specified hand and update UI
-async function addCard(cards, div, entity) {
+async function addCard(cards, div, entity, origin) {
   const card = deck.getCard();
   cards.push(card);
 
@@ -385,14 +384,14 @@ async function addCard(cards, div, entity) {
   }
   div.appendChild(imgElement);
   await animateElement(imgElement, "imgSlide", slideDelay);
+  await updateHandTotals();
+  await updateHeaders(origin);
 
   if (shouldFlipCard(entity, cards)) {
     const finalImgPath = `./assets/cards-1.3/${card.image}`;
     imgElement.src = await preloadAndGetImage(finalImgPath);
     await animateElement(imgElement, "imgFlip", flipDelay);
   }
-
-  await updateHandTotals();
 }
 
 // Create an HTML image element
