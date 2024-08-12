@@ -27,6 +27,7 @@ const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 const splitSwitch = document.getElementById("splitSwitch");
+const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
 
 // Game Variables
 const deck = new CardDeck();
@@ -60,14 +61,9 @@ window.onload = async () => {
     });
     infoModal.show();
   }
-  let message = document.createElement("h6");
-  message.textContent = "Game is loading!";
-  messageDiv.appendChild(message);
-
   await delay(animationDelay);
   setupEventListeners();
   newGameBtn.hidden = false;
-  message.textContent = "Game is ready!";
 };
 
 // Initialize the game state and UI
@@ -87,9 +83,6 @@ function initializeGame() {
     toggleWagerElements();
     enableSettingsButtons();
     newGameBtn.textContent = "New Game";
-    let message = document.createElement("h6");
-    message.textContent = "Place your wager to begin!";
-    messageDiv.appendChild(message);
   }
 }
 
@@ -181,9 +174,7 @@ async function initialDeal() {
   await hit("player", "init");
   await hit("dealer", "init");
   updateGameButtons();
-  let message = document.createElement("h6");
-  message.textContent = "Your Turn!";
-  messageDiv.appendChild(message);
+  playerHandElements[0].classList.add("activeHand");
   logGameState("Initial deal complete");
   autoStandOn21();
   enableGameButtons();
@@ -195,6 +186,7 @@ function newGame() {
   deck.newGame();
   initializeGame();
   toggleMusic();
+  resultsModal.hide();
 }
 
 // Deal a card to the player or dealer
@@ -287,15 +279,14 @@ async function playDealer() {
 async function endHand() {
   logGameState("Ending hand");
   if (currentPlayerHand === splitCount) {
-    messageDiv.removeChild(messageDiv.firstChild);
-    let message = document.createElement("h6");
-    message.textContent = "Dealer's Turn!";
-    messageDiv.appendChild(message);
+    dealersDiv.classList.add("activeHand");
 
     hideGameButtons();
 
     if (splitCount > 0) {
       playerHandElements[currentPlayerHand].classList.remove("activeHand");
+    } else {
+      playerHandElements[0].classList.remove("activeHand");
     }
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
@@ -309,10 +300,8 @@ async function endHand() {
     animateElement(dealerSecondCardImg, "imgFlip", flipDelay);
 
     updateHeaders("endGame");
-
     if (shouldDealerHit(dealerTotal, dealersHand)) await delay(animationDelay * 1.5);
     await playDealer();
-    messageDiv.removeChild(message);
     displayWinner();
   } else if (currentPlayerHand !== splitCount) {
     advanceHand();
@@ -377,6 +366,8 @@ function displayWinner() {
   } else {
     newGameBtn.toggleAttribute("hidden");
   }
+  resultsModal.show();
+  dealersDiv.classList.remove("activeHand");
 }
 
 // ############# Card Management and Display #############

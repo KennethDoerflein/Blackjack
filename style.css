@@ -61,10 +61,6 @@
   font-weight: bolder;
 }
 
-#message {
-  min-height: 40px !important;
-}
-
 #main {
   max-height: 70vh !important;
   height: 70vh !important;
@@ -82,8 +78,8 @@
 #wagerDiv img {
   box-sizing: border-box;
   border: 0.4vh solid #ccc;
-  border-radius: 3vh;
-  max-height: 6vh;
+  border-radius: 3.25vh;
+  max-height: 6.5vh;
   margin: 0.5vh;
 }
 

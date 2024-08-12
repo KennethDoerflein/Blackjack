@@ -18,11 +18,28 @@
         <source src="./assets/casino-funky-background-upbeat-and-uplifting-music-intro-theme-120445.mp3" type="audio/mpeg" />
       </audio>
 
-      <div id="message" class="container mb-4 text-center position-relative"></div>
-      <h6 id="dealerHeader" class="container text-center">Dealer's Cards</h6>
+      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+              <h5 class="modal-title mx-auto" id="resultsModalLabel">Game Results</h5>
+            </div>
+            <div class="modal-body">
+              <div id="message" class="container text-center"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="mx-auto btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="mx-auto btn btn-success" onclick="newGame()">New Game</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h6 id="dealerHeader" class="container text-center my-3">Dealer's Cards</h6>
       <div id="dealersHand" class="container"></div>
 
-      <h6 id="playerHeader" class="container text-center">Player's Cards</h6>
+      <h6 id="playerHeader" class="container text-center my-3">Player's Cards</h6>
       <span id="playersHands">
         <div id="playersHand" class="container"></div>
         <div hidden id="playersSecondHand" class="container"></div>
