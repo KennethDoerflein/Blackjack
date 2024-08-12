@@ -383,14 +383,13 @@ function displayWinner() {
 
 // Add a card to the specified hand and update UI
 async function addCard(cards, div, entity) {
-  const viewportWidth = getViewportWidth();
   const card = deck.getCard();
   cards.push(card);
 
   const imgElement = await createCardImage("./assets/cards-1.3/back.png");
 
   if (cards.length > 2) {
-    adjustCardMargins(cards, div, imgElement, viewportWidth);
+    adjustCardMargins(cards, div, imgElement);
   }
   div.appendChild(imgElement);
   await animateElement(imgElement, "imgSlide", slideDelay);
@@ -413,7 +412,8 @@ async function createCardImage(initialSrc) {
 }
 
 // Calculate and adjust card margins to avoid overflow
-async function adjustCardMargins(cards, div, imgElement, viewportWidth) {
+async function adjustCardMargins(cards, div, imgElement) {
+  const viewportWidth = getViewportWidth();
   const images = div.querySelectorAll("img");
   const cardCount = cards.length;
   let allWidth = 0;
@@ -426,7 +426,7 @@ async function adjustCardMargins(cards, div, imgElement, viewportWidth) {
 
     // `cardCount - 3` = End element + Card not yet added + Card before the last one
     if (index === cardCount - 3 && imgElement !== null) {
-      allWidth += marginLeft + marginRight + img.offsetWidth;
+      allWidth += marginLeft + marginRight + img.offsetWidth || 0;
     }
   });
 
@@ -435,10 +435,10 @@ async function adjustCardMargins(cards, div, imgElement, viewportWidth) {
   const maxImageOffsetPx = -imgWidthPx * overlapFactor;
   let marginLeftPx = 0;
 
-  if (allWidth > viewportWidth) {
-    marginLeftPx = -(allWidth - viewportWidth) / (cardCount - 1);
-    marginLeftPx += parseFloat(window.getComputedStyle(images[1]).marginLeft) || 0;
-  }
+  marginLeftPx = -(allWidth - viewportWidth) / (cardCount - 1);
+  marginLeftPx += parseFloat(window.getComputedStyle(images[1]).marginLeft) || 0;
+
+  marginLeftPx = marginLeftPx > 0 ? 0 : marginLeftPx;
 
   const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
 
@@ -673,13 +673,12 @@ async function handleResize() {
       image.classList.add("viewportResize");
     });
 
-    const viewportWidth = getViewportWidth();
     for (let i = 0; i < playerHandElements.length; i++) {
       if (playersHand[i].length > 0) {
-        adjustCardMargins(playersHand[i], playerHandElements[i], null, viewportWidth);
+        adjustCardMargins(playersHand[i], playerHandElements[i], null);
       }
     }
-    adjustCardMargins(dealersHand, dealersDiv, null, viewportWidth);
+    adjustCardMargins(dealersHand, dealersDiv, null);
     await delay(slideDelay);
     images.forEach((image) => {
       image.classList.remove("viewportResize");
@@ -825,14 +824,7 @@ function pinchEnd() {
   }
 }
 
-function pinchCanceled() {
-  scaling = false;
-  setTimeout(() => {
-    handleResize();
-  }, 500);
-}
-
 document.addEventListener("touchstart", pinchStart, false);
 document.addEventListener("touchmove", pinchMove, false);
 document.addEventListener("touchend", pinchEnd, false);
-document.addEventListener("touchcancel", pinchCanceled, false);
+document.addEventListener("touchcancel", pinchEnd, false);
