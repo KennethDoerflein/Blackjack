@@ -302,6 +302,7 @@ async function endHand() {
     updateHeaders("endGame");
     if (shouldDealerHit(dealerTotal, dealersHand)) await delay(animationDelay * 1.5);
     await playDealer();
+    await delay(animationDelay * 1.5);
     displayWinner();
   } else if (currentPlayerHand !== splitCount) {
     advanceHand();
