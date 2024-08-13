@@ -745,6 +745,7 @@ function clearWager() {
 // Create and return a winner element with the outcome text
 function createWinnerElement(outcome) {
   let winner = document.createElement("h6");
+  winner.classList.add("my-3");
   winner.textContent = outcome;
   return winner;
 }
