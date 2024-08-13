@@ -13,21 +13,38 @@
     <link href="./style.css" rel="stylesheet" />
   </head>
   <body>
-    <div id="main" class="container my-2">
+    <div id="main" class="container-fluid my-2">
       <audio id="backgroundMusic" loop class="container text-center">
         <source src="./assets/casino-funky-background-upbeat-and-uplifting-music-intro-theme-120445.mp3" type="audio/mpeg" />
       </audio>
 
-      <div id="message" class="container mb-4 text-center position-relative"></div>
-      <h6 id="dealerHeader" class="container text-center">Dealer's Cards</h6>
+      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <button type="button" class="btn-close ms-auto p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+              <h5 class="modal-title mx-auto" id="resultsModalLabel">Game Results</h5>
+            </div>
+            <div class="modal-body">
+              <div id="message" class="container text-center"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="mx-auto btn btn-success" onclick="newGame()">New Game</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h6 id="dealerHeader" class="container text-center my-3">Dealer's Cards</h6>
       <div id="dealersHand" class="container"></div>
-      <h6 id="playerHeader" class="container text-center">Player's Cards</h6>
-      <div id="playersHands" class="mx-auto">
+
+      <h6 id="playerHeader" class="container text-center my-3">Player's Cards</h6>
+      <span id="playersHands">
         <div id="playersHand" class="container"></div>
         <div hidden id="playersSecondHand" class="container"></div>
         <div hidden id="playersThirdHand" class="container"></div>
         <div hidden id="playersFourthHand" class="container"></div>
-      </div>
+      </span>
 
       <div class="container mt-2 d-flex justify-content-center">
         <div id="pointsDisplay" class="text-center me-3 mb-2 px-4 border rounded d-flex align-items-center justify-content-center">Points*: ----</div>
@@ -82,7 +99,7 @@
               <label class="form-check-label" for="musicSwitch">Music</label>
             </div>
             <div class="form-check form-switch">
-              <input checked class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
+              <input class="form-check-input" type="checkbox" role="switch" id="standSwitch" />
               <label class="form-check-label" for="standSwitch">Automatically Stand When You Get 21</label>
             </div>
             <div class="form-check form-switch">

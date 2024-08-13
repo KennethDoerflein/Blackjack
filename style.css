@@ -1,9 +1,39 @@
+* {
+  touch-action: manipulation;
+}
+
+#dealersHand,
+#playersHands > div {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center; /* Center the hand */
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  padding: 11px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  max-height: 18vh !important;
+  min-height: 18vh !important;
+  height: 18vh !important;
+  max-width: 85vw !important;
+  width: fit-content;
+  min-width: 22vh;
+  background-color: rgb(9, 59, 9);
+  overflow: hidden;
+}
+
 #dealersHand img,
 #playersHands > div img {
   max-height: 100% !important;
-  margin-right: -3vh;
-  margin-left: -3vh;
+  margin-right: 11px;
+  margin-left: 0px;
   transform-style: preserve-3d;
+}
+
+#dealersHand img:last-child,
+#playersHands > div img:last-child {
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
 #hitBtn {
@@ -26,27 +56,9 @@
   border-radius: 10px;
 }
 
-#dealersHand,
-#playersHands > div {
-  border: 1px solid #ccc;
-  padding: 1.4vh;
-  margin-bottom: 15px;
-  padding-left: 4.5vh;
-  border-radius: 5px;
-  max-height: 18vh !important;
-  min-height: 18vh !important;
-  height: 18vh !important;
-  max-width: 90vh;
-  background-color: rgb(9, 59, 9);
-}
-
 #message h6 {
   color: rgb(204, 58, 58);
   font-weight: bolder;
-}
-
-#message {
-  min-height: 40px !important;
 }
 
 #main {
@@ -66,8 +78,8 @@
 #wagerDiv img {
   box-sizing: border-box;
   border: 0.4vh solid #ccc;
-  border-radius: 3vh;
-  max-height: 6vh;
+  border-radius: 3.25vh;
+  max-height: 6.5vh;
   margin: 0.5vh;
 }
 
@@ -152,4 +164,8 @@
 
 .highlight {
   animation: highlight 0.5s linear;
+}
+
+.viewportResize {
+  transition: margin-left 0.3s ease-in-out;
 }

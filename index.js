@@ -1,7 +1,8 @@
 // ############# Global Variables and Constants #############
 
 // Debug mode variable
-const debugMode = false; // Set to true to enable logging
+const debugMode = false; // Set to true to disable info modal
+const verboseLogging = false; // Set to true to enable logging
 
 // DOM Elements
 const hitBtn = document.getElementById("hitBtn");
@@ -26,15 +27,24 @@ const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 const splitSwitch = document.getElementById("splitSwitch");
+const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
+const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
+  keyboard: false,
+});
 
 // Game Variables
 const deck = new CardDeck();
-const flipDelay = 700;
-const slideDelay = 300;
+const flipDelay = 700 / 2;
+const slideDelay = 300 + 50;
+const chipDelay = 700;
 const animationDelay = slideDelay + flipDelay;
 let dealersHand, dealerTotal, playersHand, playerTotal, currentPlayerHand, splitCount, previousPlayerHand;
 let playerPoints = 100;
 let currentWager = [0, 0, 0, 0];
+
+// UI variables
+let lastResize = 0;
+let lastTouchEnd = 0;
 
 // Array for player's hand elements
 const playerHandElements = [
@@ -49,19 +59,11 @@ const playerHandElements = [
 // Start the game and show the info modal if not in debug mode
 window.onload = async () => {
   if (!debugMode) {
-    const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
-      keyboard: false,
-    });
     infoModal.show();
   }
-  let message = document.createElement("h6");
-  message.textContent = "Game is loading!";
-  messageDiv.appendChild(message);
-
   await delay(animationDelay);
   setupEventListeners();
   newGameBtn.hidden = false;
-  message.textContent = "Game is ready!";
 };
 
 // Initialize the game state and UI
@@ -77,15 +79,10 @@ function initializeGame() {
 
     resetGameVariables();
     clearGameBoard();
-    removeEventListeners();
-    setupEventListeners();
     updatePoints();
     toggleWagerElements();
     enableSettingsButtons();
     newGameBtn.textContent = "New Game";
-    let message = document.createElement("h6");
-    message.textContent = "Place your wager to begin!";
-    messageDiv.appendChild(message);
   }
 }
 
@@ -177,9 +174,7 @@ async function initialDeal() {
   await hit("player", "init");
   await hit("dealer", "init");
   updateGameButtons();
-  let message = document.createElement("h6");
-  message.textContent = "Your Turn!";
-  messageDiv.appendChild(message);
+  playerHandElements[0].classList.add("activeHand");
   logGameState("Initial deal complete");
   autoStandOn21();
   enableGameButtons();
@@ -191,24 +186,23 @@ function newGame() {
   deck.newGame();
   initializeGame();
   toggleMusic();
+  resultsModal.hide();
 }
 
 // Deal a card to the player or dealer
 async function hit(entity = "player", origin = "user") {
   logGameState(`Hit: ${entity}, Origin: ${origin}`);
 
-  hitBtn.removeEventListener("click", hit);
   disableGameButtons();
 
   await updateHeaders();
 
   if (entity !== "dealer") {
-    await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], entity);
+    await addCard(playersHand[currentPlayerHand], playerHandElements[currentPlayerHand], entity, origin);
   } else {
-    await addCard(dealersHand, dealersDiv, entity);
+    await addCard(dealersHand, dealersDiv, entity, origin);
   }
 
-  await updateHeaders(origin);
   if (entity !== "dealer" && origin === "user") {
     updateGameButtons();
     if (playerTotal[currentPlayerHand] > 21) {
@@ -220,7 +214,6 @@ async function hit(entity = "player", origin = "user") {
   }
 
   await delay(animationDelay);
-  hitBtn.addEventListener("click", hit);
   enableGameButtons();
 }
 
@@ -285,23 +278,20 @@ async function playDealer() {
 async function endHand() {
   logGameState("Ending hand");
   if (currentPlayerHand === splitCount) {
-    messageDiv.removeChild(messageDiv.firstChild);
-    let message = document.createElement("h6");
-    message.textContent = "Dealer's Turn!";
-    messageDiv.appendChild(message);
+    dealersDiv.classList.add("activeHand");
 
     hideGameButtons();
-    hitBtn.removeEventListener("click", hit);
-    standBtn.removeEventListener("click", endHand);
 
     if (splitCount > 0) {
       playerHandElements[currentPlayerHand].classList.remove("activeHand");
+    } else {
+      playerHandElements[0].classList.remove("activeHand");
     }
 
     let dealerSecondCardImg = dealersDiv.getElementsByTagName("img")[1];
     let imgPath = `./assets/cards-1.3/${dealersHand[1].image}`;
 
-    await delay(animationDelay / 2);
+    await delay(animationDelay * 1.5);
 
     await preloadImage(imgPath);
     dealerSecondCardImg.src = imgPath;
@@ -309,10 +299,9 @@ async function endHand() {
     animateElement(dealerSecondCardImg, "imgFlip", flipDelay);
 
     updateHeaders("endGame");
-
-    if (shouldDealerHit(dealerTotal, dealersHand)) await delay(flipDelay);
+    if (shouldDealerHit(dealerTotal, dealersHand)) await delay(animationDelay * 1.5);
     await playDealer();
-    messageDiv.removeChild(message);
+    await delay(animationDelay);
     displayWinner();
   } else if (currentPlayerHand !== splitCount) {
     advanceHand();
@@ -377,37 +366,93 @@ function displayWinner() {
   } else {
     newGameBtn.toggleAttribute("hidden");
   }
+  resultsModal.show();
+  dealersDiv.classList.remove("activeHand");
 }
 
 // ############# Card Management and Display #############
 
 // Add a card to the specified hand and update UI
-async function addCard(cards, div, entity) {
+async function addCard(cards, div, entity, origin) {
   const card = deck.getCard();
   cards.push(card);
 
-  let imgPath = "./assets/cards-1.3/back.png";
-  let img = document.createElement("img");
+  const imgElement = await createCardImage("./assets/cards-1.3/back.png");
 
-  // Preload the back image
-  await preloadImage(imgPath);
-  img.src = imgPath;
-  div.appendChild(img);
-
-  // Animate the card slide-in
-  await animateElement(img, "imgSlide", slideDelay);
-
-  // Update the card image if necessary
-  if ((entity === "dealer" && cards.length !== 2) || entity !== "dealer") {
-    let finalImgPath = `./assets/cards-1.3/${card.image}`;
-    await preloadImage(finalImgPath);
-    img.src = finalImgPath;
-
-    // Animate the card flip
-    animateElement(img, "imgFlip", flipDelay);
+  if (cards.length > 2) {
+    adjustCardMargins(cards, div, imgElement);
   }
-
+  div.appendChild(imgElement);
+  await animateElement(imgElement, "imgSlide", slideDelay);
   await updateHandTotals();
+  await updateHeaders(origin);
+
+  if (shouldFlipCard(entity, cards)) {
+    const finalImgPath = `./assets/cards-1.3/${card.image}`;
+    imgElement.src = await preloadAndGetImage(finalImgPath);
+    await animateElement(imgElement, "imgFlip", flipDelay);
+  }
+}
+
+// Create an HTML image element
+async function createCardImage(initialSrc) {
+  await preloadImage(initialSrc);
+  const imgElement = document.createElement("img");
+  imgElement.src = initialSrc;
+  return imgElement;
+}
+
+// Calculate and adjust card margins to avoid overflow
+async function adjustCardMargins(cards, div, imgElement) {
+  const viewportWidth = getViewportWidth();
+  const images = div.querySelectorAll("img");
+  const cardCount = cards.length;
+  let allWidth = 0;
+
+  images.forEach((img, index) => {
+    const computedStyle = window.getComputedStyle(img);
+    const marginLeft = parseFloat(computedStyle.marginLeft) || 0;
+    const marginRight = parseFloat(computedStyle.marginRight) || 0;
+    allWidth += marginLeft + marginRight + img.offsetWidth;
+
+    // `cardCount - 3` = End element + Card not yet added + Card before the last one
+    if (index === cardCount - 3 && imgElement !== null) {
+      allWidth += marginLeft + marginRight + img.offsetWidth || 0;
+    }
+  });
+
+  const imgWidthPx = images[1].offsetWidth;
+  const overlapFactor = window.innerHeight > window.innerWidth ? 0.9 : 0.75;
+  const maxImageOffsetPx = -imgWidthPx * overlapFactor;
+  let marginLeftPx = 0;
+
+  marginLeftPx = -(allWidth - viewportWidth) / (cardCount - 1);
+  marginLeftPx += parseFloat(window.getComputedStyle(images[1]).marginLeft) || 0;
+
+  marginLeftPx = marginLeftPx > 0 ? 0 : marginLeftPx;
+
+  const finalMarginPx = Math.max(marginLeftPx, maxImageOffsetPx);
+
+  images.forEach((img, index) => {
+    if (index !== 0) {
+      img.style.marginLeft = `${finalMarginPx}px`;
+    }
+  });
+
+  if (imgElement) {
+    imgElement.style.marginLeft = `${finalMarginPx}px`;
+  }
+}
+
+// Check if a card should be face up
+function shouldFlipCard(entity, cards) {
+  return entity !== "dealer" || cards.length !== 2;
+}
+
+// Preload an image and return its src
+async function preloadAndGetImage(src) {
+  await preloadImage(src);
+  return src;
 }
 
 // Preload an image
@@ -520,10 +565,9 @@ function updatePoints() {
 // Add chip value to the current wager
 function addChipValue(event) {
   logGameState("Adding chip value");
-  removeChipEventListeners();
 
-  animateElement(wagerDisplay, "highlight", flipDelay);
-  animateElement(event.target, "chipFlip", flipDelay);
+  animateElement(wagerDisplay, "highlight", chipDelay);
+  animateElement(event.target, "chipFlip", chipDelay);
 
   let chipValue = parseInt(event.target.dataset.value);
   let newWager = currentWager[currentPlayerHand] + chipValue;
@@ -536,7 +580,6 @@ function addChipValue(event) {
   }
 
   updatePoints();
-  setupChipEventListeners();
 }
 
 // Place the wager and start the initial deal
@@ -611,6 +654,37 @@ function clearDiv(div) {
   }
 }
 
+// Adjust margins for all hands
+async function handleResize() {
+  let now = new Date().getTime();
+  if (dealerTotal > 0 && dealersHand.length >= 2 && now - lastResize >= slideDelay) {
+    const images = document.querySelectorAll("img");
+
+    images.forEach((image) => {
+      image.classList.add("viewportResize");
+    });
+
+    for (let i = 0; i < playerHandElements.length; i++) {
+      if (playersHand[i].length > 0) {
+        adjustCardMargins(playersHand[i], playerHandElements[i], null);
+      }
+    }
+    adjustCardMargins(dealersHand, dealersDiv, null);
+    await delay(slideDelay);
+    images.forEach((image) => {
+      image.classList.remove("viewportResize");
+    });
+  }
+  lastResize = now;
+}
+
+function getViewportWidth() {
+  return window.innerWidth < 1000 ? window.innerWidth * 0.8 : window.innerWidth * 0.5;
+}
+
+// Add event listener for resize
+window.addEventListener("resize", handleResize);
+
 // ############# Utilities and Debugging #############
 
 // Create a delay in milliseconds
@@ -620,7 +694,7 @@ function delay(ms) {
 
 // Log the game state to the console for debugging
 function logGameState(action) {
-  if (debugMode) {
+  if (verboseLogging) {
     console.log(`[${new Date().toISOString()}] Action: ${action}`);
     console.log(`Dealers Hand: ${JSON.stringify(dealersHand)}`);
     console.log(`Players Hand: ${JSON.stringify(playersHand)}`);
@@ -702,3 +776,46 @@ function disableSettingsButtons() {
   splitSwitch.disabled = true;
   soft17Switch.disabled = true;
 }
+
+// ############# Touchscreen Specific Listeners #############
+
+document.addEventListener(
+  "touchend",
+  function (event) {
+    let now = new Date().getTime();
+    if (now - lastTouchEnd <= 350) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  },
+  false
+);
+
+// ### Zoom in/out Detection
+let scaling = false;
+
+function pinchStart(e) {
+  if (e.touches.length === 2) {
+    scaling = true;
+  }
+}
+
+function pinchMove() {
+  if (scaling) {
+    handleResize();
+  }
+}
+
+function pinchEnd() {
+  if (scaling) {
+    scaling = false;
+    setTimeout(() => {
+      handleResize();
+    }, 500);
+  }
+}
+
+document.addEventListener("touchstart", pinchStart, false);
+document.addEventListener("touchmove", pinchMove, false);
+document.addEventListener("touchend", pinchEnd, false);
+document.addEventListener("touchcancel", pinchEnd, false);
