@@ -10,6 +10,7 @@ const splitBtn = document.getElementById("splitBtn");
 const doubleDownBtn = document.getElementById("doubleDownBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
+const resultsBtn = document.getElementById("resultsBtn");
 const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
 const dealerHeader = document.getElementById("dealerHeader");
@@ -64,6 +65,7 @@ window.onload = async () => {
   await delay(animationDelay);
   setupEventListeners();
   newGameBtn.hidden = false;
+  newGame();
 };
 
 // Initialize the game state and UI
@@ -182,11 +184,14 @@ async function initialDeal() {
 
 // Start a new game by shuffling the deck and resetting the UI
 function newGame() {
-  newGameBtn.toggleAttribute("hidden");
-  deck.newGame();
-  initializeGame();
-  toggleMusic();
-  resultsModal.hide();
+  if (playerPoints > 0) {
+    newGameBtn.hidden = false;
+    resultsBtn.hidden = true;
+    deck.newGame();
+    initializeGame();
+    toggleMusic();
+    resultsModal.hide();
+  }
 }
 
 // Deal a card to the player or dealer
@@ -364,9 +369,8 @@ function displayWinner() {
     message.classList.add("mt-2", "mb-5");
     bottomDiv.appendChild(message);
   } else {
-    newGameBtn.toggleAttribute("hidden");
+    resultsBtn.hidden = false;
   }
-  resultsModal.show();
   dealersDiv.classList.remove("activeHand");
 }
 
@@ -645,6 +649,7 @@ function hideGameButtons() {
   standBtn.hidden = true;
   splitBtn.hidden = true;
   doubleDownBtn.hidden = true;
+  resultsBtn.hidden = true;
 }
 
 // Clear all child elements from a given div
