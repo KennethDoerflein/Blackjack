@@ -18,7 +18,7 @@
         <source src="./assets/casino-funky-background-upbeat-and-uplifting-music-intro-theme-120445.mp3" type="audio/mpeg" />
       </audio>
 
-      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+      <!-- <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <button type="button" class="btn-close ms-auto p-2 position-absolute top-0 end-0" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -33,6 +33,10 @@
             </div>
           </div>
         </div>
+      </div> -->
+
+      <div hidden id="resultsAlert" class="alert alert-info alert-dismissible fade show w-75 mx-auto px-0" role="alert">
+        <div id="message" class="container text-center"></div>
       </div>
 
       <h6 id="dealerHeader" class="container text-center my-3">Dealer's Cards</h6>
@@ -70,7 +74,7 @@
           <button hidden id="splitBtn" type="button" class="btn-sm btn btn-primary mx-2">Split</button>
           <button hidden id="doubleDownBtn" type="button" class="btn-sm btn btn-light mx-2">Double<br />Down</button>
           <button hidden id="standBtn" type="button" class="btn-sm btn btn-danger mx-2">Stand</button>
-          <button hidden id="resultsBtn" type="button" class="btn-sm btn btn-info mx-2" data-bs-toggle="modal" data-bs-target="#resultsModal">Show Results</button>
+          <button hidden id="newGameBtn" type="button" class="btn-sm btn btn-success mx-auto my-1">New Game</button>
         </div>
       </div>
 
