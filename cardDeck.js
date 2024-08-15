@@ -16,9 +16,7 @@ class CardDeck {
 
     this.cards = this.createDeck();
     this.dealtCards = [];
-    this.preloadImages().then(() => {
-      this.shuffle();
-    });
+    this.shuffle();
   }
 
   createDeck() {
@@ -34,20 +32,6 @@ class CardDeck {
     return deck;
   }
 
-  preloadImages() {
-    let images = this.cards.map((card) => `./assets/cards-1.3/${card.image}`);
-
-    let promises = images.map((src) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = resolve;
-      });
-    });
-
-    return Promise.all(promises);
-  }
-
   shuffle() {
     // Durstenfeld shuffle
     for (let i = this.cards.length - 1; i > 0; i--) {
@@ -56,7 +40,7 @@ class CardDeck {
     }
   }
 
-  newGame() {
+  reshuffle() {
     this.cards = this.cards.concat(this.dealtCards);
     this.dealtCards = [];
     this.shuffle();

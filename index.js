@@ -187,7 +187,7 @@ function newGame() {
   if (playerPoints > 0) {
     newGameBtn.hidden = false;
     resultsBtn.hidden = true;
-    deck.newGame();
+    deck.reshuffle();
     initializeGame();
     toggleMusic();
     resultsModal.hide();
