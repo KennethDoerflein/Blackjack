@@ -10,7 +10,6 @@ const splitBtn = document.getElementById("splitBtn");
 const doubleDownBtn = document.getElementById("doubleDownBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
-const resultsBtn = document.getElementById("resultsBtn");
 const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
 const dealerHeader = document.getElementById("dealerHeader");
@@ -28,10 +27,10 @@ const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 const splitSwitch = document.getElementById("splitSwitch");
-const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
 const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
   keyboard: false,
 });
+const resultsAlert = document.getElementById("resultsAlert");
 
 // Game Variables
 const deck = new CardDeck();
@@ -64,7 +63,6 @@ window.onload = async () => {
   }
   await delay(animationDelay);
   setupEventListeners();
-  newGameBtn.hidden = false;
   newGame();
 };
 
@@ -185,12 +183,11 @@ async function initialDeal() {
 // Start a new game by shuffling the deck and resetting the UI
 function newGame() {
   if (playerPoints > 0) {
-    newGameBtn.hidden = false;
-    resultsBtn.hidden = true;
+    newGameBtn.hidden = true;
     deck.reshuffle();
     initializeGame();
     toggleMusic();
-    resultsModal.hide();
+    resultsAlert.hidden = true;
   }
 }
 
@@ -369,7 +366,8 @@ function displayWinner() {
     message.classList.add("mt-2", "mb-5");
     bottomDiv.appendChild(message);
   } else {
-    resultsBtn.hidden = false;
+    newGameBtn.hidden = false;
+    resultsAlert.hidden = false;
   }
   dealersDiv.classList.remove("activeHand");
 }
@@ -649,7 +647,6 @@ function hideGameButtons() {
   standBtn.hidden = true;
   splitBtn.hidden = true;
   doubleDownBtn.hidden = true;
-  resultsBtn.hidden = true;
 }
 
 // Clear all child elements from a given div
@@ -750,7 +747,7 @@ function clearWager() {
 // Create and return a winner element with the outcome text
 function createWinnerElement(outcome) {
   let winner = document.createElement("h6");
-  winner.classList.add("my-3");
+  winner.classList.add("my-1");
   winner.textContent = outcome;
   return winner;
 }
