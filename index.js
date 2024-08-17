@@ -10,7 +10,6 @@ const splitBtn = document.getElementById("splitBtn");
 const doubleDownBtn = document.getElementById("doubleDownBtn");
 const standBtn = document.getElementById("standBtn");
 const newGameBtn = document.getElementById("newGameBtn");
-// const resultsBtn = document.getElementById("resultsBtn");
 const dealersDiv = document.getElementById("dealersHand");
 const messageDiv = document.getElementById("message");
 const dealerHeader = document.getElementById("dealerHeader");
@@ -28,7 +27,6 @@ const musicSwitch = document.getElementById("musicSwitch");
 const standSwitch = document.getElementById("standSwitch");
 const soft17Switch = document.getElementById("soft17Switch");
 const splitSwitch = document.getElementById("splitSwitch");
-// const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
 const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
   keyboard: false,
 });
@@ -186,7 +184,6 @@ async function initialDeal() {
 function newGame() {
   if (playerPoints > 0) {
     newGameBtn.hidden = true;
-    // resultsBtn.hidden = true;
     deck.reshuffle();
     initializeGame();
     toggleMusic();
@@ -650,7 +647,6 @@ function hideGameButtons() {
   standBtn.hidden = true;
   splitBtn.hidden = true;
   doubleDownBtn.hidden = true;
-  // resultsBtn.hidden = true;
 }
 
 // Clear all child elements from a given div
