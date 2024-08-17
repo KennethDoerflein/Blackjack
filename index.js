@@ -587,9 +587,9 @@ function addChipValue(event) {
 // Place the wager and start the initial deal
 function placeWager(event) {
   logGameState("Placing wager");
-  var id = event.target.id;
-  var isWagerValid = !isNaN(currentWager[currentPlayerHand]) && currentWager[currentPlayerHand] > 0 && currentWager[currentPlayerHand] <= playerPoints;
-  var isAllIn = id === "allInBtn";
+  let id = event.target.id;
+  let isWagerValid = !isNaN(currentWager[currentPlayerHand]) && currentWager[currentPlayerHand] > 0 && currentWager[currentPlayerHand] <= playerPoints;
+  let isAllIn = id === "allInBtn";
 
   if (isWagerValid || isAllIn) {
     if (isAllIn) {
