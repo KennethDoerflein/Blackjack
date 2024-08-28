@@ -34,8 +34,8 @@ const resultsAlert = document.getElementById("resultsAlert");
 
 // Game Variables
 const deck = new CardDeck();
-const flipDelay = 700 / 2;
-const slideDelay = 300 + 50;
+const flipDelay = 500;
+const slideDelay = 350;
 const chipDelay = 700;
 const animationDelay = slideDelay + flipDelay;
 let dealersHand, dealerTotal, playersHand, playerTotal, currentPlayerHand, splitCount, previousPlayerHand;
